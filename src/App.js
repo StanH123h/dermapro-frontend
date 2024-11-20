@@ -1,24 +1,27 @@
-import logo from './logo.svg';
 import './App.css';
+import {
+  BrowserRouter as Router,
+  Routes
+} from 'react-router-dom';
+import createRoutes from "./route/Route";
+import {FeedPage} from "./pages/feed/FeedPage";
+import {HistoryPage} from "./pages/history/HistoryPage";
+import {ProfilePage} from "./pages/profile/ProfilePage";
 
 function App() {
+  const routesConfig = [
+    { path: '/', component: <FeedPage/>,index:0 },
+      {path:'/history', component: <HistoryPage/>, index:1},
+      {path:'/profile',component: <ProfilePage/>, index:2}
+    // {path:"/governmentCheckCarbonAmount",component: <CarbonAmountPage/>,index: 5}
+  ];
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <Router>
+        <Routes>
+          {createRoutes(routesConfig)}
+        </Routes>
+      </Router>
   );
 }
 
