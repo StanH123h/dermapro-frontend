@@ -1,6 +1,14 @@
 import {Nav} from "@douyinfe/semi-ui";
 import {Link} from "react-router-dom";
 import "./BottomNavBar.scss"
+import {
+    IconFolder,
+    IconFolderStroked,
+    IconHome,
+    IconHomeStroked,
+    IconUser,
+    IconUserStroked
+} from "@douyinfe/semi-icons";
 export const BottomNavBar = ({currentPage}) => {
     return (
         <Nav
@@ -22,15 +30,9 @@ export const BottomNavBar = ({currentPage}) => {
                 );
             }}
             items={[
-                {itemKey: "HistoryData", icon: <img src={"history-data-page-icon.svg"} alt={"history-icon"}
-                                                    style={currentPage==="history"?{border:"lightblue 2px solid"}:{}}
-                    />},
-                {itemKey: "Home", icon: <img src={"main-page-icon.svg"} alt={"home-icon"}
-                                             style={currentPage==="home"?{border:"lightblue 2px solid"}:{}}
-                    />},
-                {itemKey: "Profile", icon: <img src={"profile-page-icon.svg"} alt={"profile-icon"}
-                                                style={currentPage==="profile"?{border:"lightblue 2px solid"}:{}}
-                    />},
+                {itemKey: "HistoryData", icon: currentPage==="history"?<IconFolder/>:<IconFolderStroked/>},
+                {itemKey: "Home", icon: currentPage==="home"?<IconHome/>:<IconHomeStroked/>},
+                {itemKey: "Profile", icon: currentPage==="profile"?<IconUser/>:<IconUserStroked/>}
             ]}
         ></Nav>
     )

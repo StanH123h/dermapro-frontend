@@ -42,9 +42,9 @@
 }
 
 [class$="page"] {
+  margin: 0 4vw;
   .header{
     height: 6vh;
-    width: 100vw;
     display: flex;
     justify-content: center;
     align-items: center;

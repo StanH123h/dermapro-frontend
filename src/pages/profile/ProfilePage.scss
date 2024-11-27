@@ -1,0 +1,27 @@
+.profile-page{
+  .header{
+    width: 96vw;
+  }
+  .content{
+    display: flex;
+    flex-direction: column;
+    gap: 5vh;
+    .user-name-and-avatar{
+      display: flex;
+      align-items: center;
+      gap: 5vw;
+    }
+    .skin-history-and-trend{
+      display: flex;
+      justify-content: space-between;
+      .skin-trend,.skin-history{
+        background-color: rgb(217, 217, 217);
+        width: 45vw;
+        word-break: break-all;
+      }
+    }
+    .my-skin-info,.my-subscribes,.my-footprint{
+      background-color: rgb(217, 217, 217);
+    }
+  }
+}
