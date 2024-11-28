@@ -7,6 +7,7 @@ const CameraComponent = () => {
     const faceCascadeRef = useRef(null); // Cache the CascadeClassifier for performance
     const [isReadyToTakePhoto, setIsReadyToTakePhoto] = useState(false);
     const [warning, setWarning] = useState('正在初始化摄像头和检测器，请稍候...');
+    const [capturedImage, setCapturedImage] = useState(null); // Store captured image data
 
     useEffect(() => {
         const initialize = async () => {
@@ -183,11 +184,32 @@ const CameraComponent = () => {
         return warning || (isReadyToTakePhoto ? '可以拍照了✅' : '实时画面不符合拍照要求❌');
     };
 
+    const takePhoto = () => {
+        if (!isReadyToTakePhoto || !canvasRef.current) return;
+
+        const canvas = canvasRef.current;
+        const imageDataUrl = canvas.toDataURL('image/png'); // Capture the current frame as a base64 image
+        setCapturedImage(imageDataUrl); // Store the captured image for preview
+        setIsReadyToTakePhoto(false); // Hide the take photo button after taking a photo
+    };
+
     return (
         <div>
-            <video ref={videoRef} autoPlay playsInline width="640" height="480" />
-            <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
-            <h1>{getWarningMessage()}</h1>
+            {!capturedImage ? (
+                <>
+                    <video ref={videoRef} autoPlay playsInline width="640" height="480" />
+                    <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
+                    <h1>{getWarningMessage()}</h1>
+                    {isReadyToTakePhoto && (
+                        <button onClick={takePhoto}>拍照</button>
+                    )}
+                </>
+            ) : (
+                <div>
+                    <h2>预览图片</h2>
+                    <img src={capturedImage} alt="Captured preview" style={{ width: '100%' }} />
+                </div>
+            )}
         </div>
     );
 };
