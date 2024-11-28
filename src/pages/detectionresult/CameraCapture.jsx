@@ -7,11 +7,15 @@ const CameraComponent = () => {
     const faceCascadeRef = useRef(null); // Cache the CascadeClassifier for performance
     const [isReadyToTakePhoto, setIsReadyToTakePhoto] = useState(false);
     const [warning, setWarning] = useState('正在初始化摄像头和检测器，请稍候...');
-    const [capturedImage, setCapturedImage] = useState(null); // Store captured image data
 
     useEffect(() => {
         const initialize = async () => {
             try {
+                setWarning('正在加载 OpenCV...');
+                await new Promise((resolve) => {
+                    cv['onRuntimeInitialized'] = resolve;
+                });
+
                 setWarning('正在加载人脸检测模型...');
                 await loadCascadeFile(); // Ensure the Haar Cascade file is loaded
 
@@ -49,8 +53,9 @@ const CameraComponent = () => {
     };
 
     const loadCascadeFile = async () => {
-        const faceCascadeUrl = '/haarcascade_frontalface_default.xml';
+        const faceCascadeUrl = `${process.env.PUBLIC_URL}/haarcascade_frontalface_default.xml`;
         try {
+            console.log('正在尝试加载人脸检测模型：', faceCascadeUrl);
             const response = await fetch(faceCascadeUrl);
             if (!response.ok) {
                 throw new Error(`无法加载人脸检测模型: ${response.status} ${response.statusText}`);
@@ -124,7 +129,7 @@ const CameraComponent = () => {
             cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
 
             // Blur detection
-            const blurThreshold = 200;
+            const blurThreshold = 130;
             let laplacian = new cv.Mat();
             cv.Laplacian(gray, laplacian, cv.CV_64F);
 
@@ -159,7 +164,7 @@ const CameraComponent = () => {
                 if (face.width < minFaceWidth || face.height < minFaceHeight) {
                     setWarning('人脸过小或未完全显示，请调整位置');
                     isValid = false;
-                } else {
+                } else if (isValid) {
                     setWarning('');
                 }
             }
@@ -184,32 +189,11 @@ const CameraComponent = () => {
         return warning || (isReadyToTakePhoto ? '可以拍照了✅' : '实时画面不符合拍照要求❌');
     };
 
-    const takePhoto = () => {
-        if (!isReadyToTakePhoto || !canvasRef.current) return;
-
-        const canvas = canvasRef.current;
-        const imageDataUrl = canvas.toDataURL('image/png'); // Capture the current frame as a base64 image
-        setCapturedImage(imageDataUrl); // Store the captured image for preview
-        setIsReadyToTakePhoto(false); // Hide the take photo button after taking a photo
-    };
-
     return (
         <div>
-            {!capturedImage ? (
-                <>
-                    <video ref={videoRef} autoPlay playsInline width="640" height="480" />
-                    <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
-                    <h1>{getWarningMessage()}</h1>
-                    {isReadyToTakePhoto && (
-                        <button onClick={takePhoto}>拍照</button>
-                    )}
-                </>
-            ) : (
-                <div>
-                    <h2>预览图片</h2>
-                    <img src={capturedImage} alt="Captured preview" style={{ width: '100%' }} />
-                </div>
-            )}
+            <video ref={videoRef} autoPlay playsInline width="640" height="480" />
+            <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
+            <h1>{getWarningMessage()}</h1>
         </div>
     );
 };
