@@ -1,12 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import * as cv from '@techstark/opencv-js';
+import "./SnapshotPage.scss"
+import {Layout} from "@douyinfe/semi-ui";
+import {IconCamera} from "@douyinfe/semi-icons";
 
-const CameraComponent = () => {
+const SnapshotPage = () => {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
     const faceCascadeRef = useRef(null); // Cache the CascadeClassifier for performance
     const [isReadyToTakePhoto, setIsReadyToTakePhoto] = useState(false);
     const [warning, setWarning] = useState('正在初始化摄像头和检测器，请稍候...');
+    const [capturedImage, setCapturedImage] = useState(null); // Store captured image data
+    const {Header, Content, Footer} = Layout
 
     useEffect(() => {
         const initialize = async () => {
@@ -43,7 +48,7 @@ const CameraComponent = () => {
             }
 
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'user' },
+                video: {facingMode: 'user'},
             });
             videoRef.current.srcObject = stream;
         } catch (err) {
@@ -110,7 +115,7 @@ const CameraComponent = () => {
             let isValid = true; // Track if the image meets all conditions
 
             // Brightness check
-            const brightnessThreshold = { min: 70, max: 180 };
+            const brightnessThreshold = {min: 70, max: 180};
             const mean = cv.mean(src);
             const brightness = (mean[0] + mean[1] + mean[2]) / 3;
 
@@ -129,7 +134,7 @@ const CameraComponent = () => {
             cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
 
             // Blur detection
-            const blurThreshold = 130;
+            const blurThreshold = 75;
             let laplacian = new cv.Mat();
             cv.Laplacian(gray, laplacian, cv.CV_64F);
 
@@ -189,13 +194,45 @@ const CameraComponent = () => {
         return warning || (isReadyToTakePhoto ? '可以拍照了✅' : '实时画面不符合拍照要求❌');
     };
 
+    const takePhoto = () => {
+        if (!isReadyToTakePhoto || !canvasRef.current) return;
+
+        const canvas = canvasRef.current;
+        const imageDataUrl = canvas.toDataURL('image/png'); // Capture the current frame as a base64 image
+        setCapturedImage(imageDataUrl); // Store the captured image for preview
+        setIsReadyToTakePhoto(false); // Hide the take photo button after taking a photo
+    };
+
+
     return (
-        <div>
-            <video ref={videoRef} autoPlay playsInline width="640" height="480" />
-            <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
-            <h1>{getWarningMessage()}</h1>
+        <div className={"snapshot-page"}>
+            <Layout>
+                <Header className={"header"}></Header>
+                <Content className={"content"}>
+                    {!capturedImage ? (
+                        <div className={"photo-taking"}>
+                            <button className={"button"} onClick={takePhoto}
+                                    style={{backgroundColor:isReadyToTakePhoto?"blanchedalmond":"gray"}}
+                                    disabled={!isReadyToTakePhoto}
+                            ><IconCamera/></button>
+                                <video className={"video"} ref={videoRef} autoPlay playsInline width="640"
+                                       height="480"/>
+                                <canvas ref={canvasRef} style={{display: 'none'}}></canvas>
+                                <h1>{getWarningMessage()}</h1>
+
+                                </div>
+                                ) : (
+                                <div className={"preview"}>
+                            <h2>预览图片</h2>
+                            <img src={capturedImage} alt="Captured preview" style={{width: '100%'}}/>
+                        </div>
+                    )}
+                </Content>
+                <Footer className={"footer"}></Footer>
+            </Layout>
         </div>
+
     );
 };
 
-export default CameraComponent;
+export default SnapshotPage;

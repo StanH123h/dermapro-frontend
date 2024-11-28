@@ -1,0 +1,17 @@
+.snapshot-page {
+  .content {
+    .photo-taking {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      .video,.canvas {
+        width: 92vw;
+      }
+      .button{
+        width: 50vw;
+        height: 20vw;
+        border-radius: 5vw;
+      }
+    }
+  }
+}
