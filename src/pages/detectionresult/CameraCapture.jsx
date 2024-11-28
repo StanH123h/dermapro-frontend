@@ -4,8 +4,9 @@ import * as cv from '@techstark/opencv-js';
 const CameraComponent = () => {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
-    const [warning, setWarning] = useState('');
     const faceCascadeRef = useRef(null); // Cache the CascadeClassifier for performance
+    const [isReadyToTakePhoto, setIsReadyToTakePhoto] = useState(false);
+    const [warning, setWarning] = useState('');
 
     useEffect(() => {
         const initialize = async () => {
@@ -41,12 +42,16 @@ const CameraComponent = () => {
             cv.FS_createDataFile('/', 'haarcascade_frontalface_default.xml', data, true, false, false);
             console.log('Cascade file loaded successfully');
         } catch (error) {
-            console.error('Error loading Haar Cascade file:', error.message);
+            console.warn('Non-critical error loading Haar Cascade file:', error.message);
         }
     };
 
     const initializeFaceCascade = () => {
         try {
+            if (!cv.CascadeClassifier) {
+                console.error('CascadeClassifier is not available in OpenCV.js');
+                return;
+            }
             faceCascadeRef.current = new cv.CascadeClassifier('haarcascade_frontalface_default.xml');
             console.log('CascadeClassifier initialized successfully');
         } catch (error) {
@@ -55,38 +60,39 @@ const CameraComponent = () => {
     };
 
     const processFrame = () => {
-        if (!videoRef.current || !canvasRef.current || !faceCascadeRef.current) return;
+        if (!videoRef.current || !canvasRef.current || !faceCascadeRef.current) {
+            console.warn('Skipping frame processing due to missing resources');
+            return;
+        }
 
         const canvas = canvasRef.current;
         const video = videoRef.current;
         const ctx = canvas.getContext('2d');
 
-        // Ensure video has valid dimensions
         if (video.videoWidth === 0 || video.videoHeight === 0) return;
 
-        // Set canvas size to match video dimensions
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
 
-        // Draw the current video frame to the canvas
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-        // Convert the frame to an OpenCV Mat object
         let src = cv.matFromImageData(imageData);
 
         try {
+            let isValid = true; // Track if the image meets all conditions
+
             // Brightness check
+            const brightnessThreshold = { min: 70, max: 180 };
             const mean = cv.mean(src);
             const brightness = (mean[0] + mean[1] + mean[2]) / 3;
-            if (brightness < 50) {
-                setWarning('The image is too dark');
-                cleanup(src);
-                return;
-            } else if (brightness > 200) {
-                setWarning('The image is too bright');
-                cleanup(src);
-                return;
+
+            if (brightness < brightnessThreshold.min) {
+                setWarning('The image is too dark, please ensure good lighting');
+                isValid = false;
+            } else if (brightness > brightnessThreshold.max) {
+                setWarning('The image is too bright, please avoid overexposure');
+                isValid = false;
             } else {
                 setWarning('');
             }
@@ -96,6 +102,7 @@ const CameraComponent = () => {
             cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
 
             // Blur detection
+            const blurThreshold = 200;
             let laplacian = new cv.Mat();
             cv.Laplacian(gray, laplacian, cv.CV_64F);
 
@@ -104,33 +111,47 @@ const CameraComponent = () => {
             cv.meanStdDev(laplacian, meanMat, stddev);
             const variance = stddev.data64F[0] ** 2;
 
-            if (variance < 100) {
-                setWarning('The image is blurry');
-                cleanup(src, gray, laplacian, meanMat, stddev);
-                return;
+            if (variance < blurThreshold) {
+                setWarning('The image is blurry, please focus properly');
+                isValid = false;
             }
 
             // Face detection
             const faces = new cv.RectVector();
-            faceCascadeRef.current.detectMultiScale(gray, faces, 1.1, 3, 0);
+            faceCascadeRef.current.detectMultiScale(
+                gray,
+                faces,
+                1.1,
+                5,
+                cv.CASCADE_FIND_BIGGEST_OBJECT
+            );
 
             if (faces.size() === 0) {
-                setWarning('No face detected');
+                setWarning('No face detected, please ensure your face is fully visible');
+                isValid = false;
             } else {
                 const face = faces.get(0);
-                if (face.width < canvas.width * 0.2 || face.height < canvas.height * 0.2) {
-                    setWarning('Face is partially obscured or not fully visible');
+                const minFaceWidth = canvas.width * 0.3;
+                const minFaceHeight = canvas.height * 0.3;
+
+                if (face.width < minFaceWidth || face.height < minFaceHeight) {
+                    setWarning(
+                        'Face is too small or partially visible, please center your face in the frame'
+                    );
+                    isValid = false;
                 } else {
                     setWarning('');
                 }
             }
 
-            // Cleanup
             faces.delete();
             cleanup(src, gray, laplacian, meanMat, stddev);
+
+            setIsReadyToTakePhoto(isValid);
         } catch (error) {
             console.error('Face detection error:', error.message);
             cleanup(src);
+            setIsReadyToTakePhoto(false);
         }
     };
 
@@ -138,11 +159,18 @@ const CameraComponent = () => {
         mats.forEach((mat) => mat && mat.delete());
     };
 
+    const getWarningMessage = () => {
+        if (!isReadyToTakePhoto) {
+            return warning || '实时画面不符合照相要求❌';
+        }
+        return '可以拍照了✅';
+    };
+
     return (
         <div>
             <video ref={videoRef} autoPlay playsInline width="640" height="480" />
             <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
-            {warning ? <h1 className="warning">{warning}</h1> : <h1>FACE DETECTED ✅</h1>}
+            <h1>{getWarningMessage()}</h1>
         </div>
     );
 };
