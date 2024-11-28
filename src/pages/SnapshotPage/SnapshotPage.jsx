@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import * as cv from '@techstark/opencv-js';
 import "./SnapshotPage.scss"
-import {Layout} from "@douyinfe/semi-ui";
+import {Button, Layout} from "@douyinfe/semi-ui";
 import {IconCamera} from "@douyinfe/semi-icons";
 
 const SnapshotPage = () => {
@@ -212,19 +212,23 @@ const SnapshotPage = () => {
                     {!capturedImage ? (
                         <div className={"photo-taking"}>
                             <button className={"button"} onClick={takePhoto}
-                                    style={{backgroundColor:isReadyToTakePhoto?"blanchedalmond":"gray"}}
+                                    style={{backgroundColor: isReadyToTakePhoto ? "blanchedalmond" : "gray"}}
                                     disabled={!isReadyToTakePhoto}
                             ><IconCamera/></button>
-                                <video className={"video"} ref={videoRef} autoPlay playsInline width="640"
-                                       height="480"/>
-                                <canvas ref={canvasRef} style={{display: 'none'}}></canvas>
-                                <h1>{getWarningMessage()}</h1>
+                            <video className={"video"} ref={videoRef} autoPlay playsInline width="640"
+                                   height="480"/>
+                            <canvas ref={canvasRef} style={{display: 'none'}}></canvas>
+                            <h1>{getWarningMessage()}</h1>
 
-                                </div>
-                                ) : (
-                                <div className={"preview"}>
+                        </div>
+                    ) : (
+                        <div className={"preview"}>
                             <h2>预览图片</h2>
                             <img src={capturedImage} alt="Captured preview" style={{width: '100%'}}/>
+                            <div className="options">
+                                <Button>重新拍照</Button>
+                                <Button>就用这张!</Button>
+                            </div>
                         </div>
                     )}
                 </Content>
