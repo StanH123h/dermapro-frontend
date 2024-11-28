@@ -1,22 +1,18 @@
 import "./DetectionPage.scss";
-import {Button, Layout, Table, TabPane, Tabs} from "@douyinfe/semi-ui";
+import { Layout, Table, TabPane, Tabs} from "@douyinfe/semi-ui";
 import {IconChevronLeft} from "@douyinfe/semi-icons";
 import {useEffect, useRef, useState} from "react";
 import {ACNETYPES, TRANSLATED_SKIN_TONE, TRANSLATED_SKIN_TYPE, TRANSLATED_WRINKLE_DATA} from "./constants";
-import mockData from "./mockdata.json"
-import {useNavigate} from "react-router-dom";
-import axios from "axios";
+import {useLocation, useNavigate} from "react-router-dom";
 
 export const AcneAnalyze = ({imgUrl, data}) => {
     const imageRef = useRef(null); // 用于访问 img
     const [imageSize, setImageSize] = useState({width: 0, height: 0}); // 图片的显示尺寸
     const [imageLoaded, setImageLoaded] = useState(false); // 标记图片是否加载完成
     const [currentDisplayData, setCurrentDisplayData] = useState("acne");
-    const {Header, Content, Footer} = Layout;
-
     const currentDisplayDataTitle = {
-        acne: "痤疮分析",
-        brown_spot: "褐斑分析",
+        acne: "痤疮",
+        brown_spot: "褐斑",
         acne_mark: "痘印",
         acne_pustule: "脓包"
     };
@@ -222,38 +218,11 @@ const SkinAnalysis = ({ data }) => {
 };
 
 export const DetectionPage = () => {
+    const location=useLocation();
+    const responseData=location.state?.responseData;
+    const capturedImage=location.state?.capturedImage;
     const navigate=useNavigate();
-    const imgUrl = "acne-girl.jpg";
     const {Header,Content,Footer}=Layout;
-
-    const sendFormData = async () => {
-        // 创建 FormData 实例
-        const formData = new FormData();
-
-        // 添加 key-value 数据
-        formData.append('api_key', '3OArM8NmM2U01LOeRtsIsVkSGKiXgMHB');
-        formData.append('api_secret', 'HYwoEG6VYWYNQPX2YeuEFlnrMlC-ylDp');
-
-        const response = await fetch('/acne-girl.jpg');  // 图片路径从 public 文件夹开始
-        const blob = await response.blob();  // 将图片转化为 Blob 对象
-
-        // 创建一个 File 对象
-        const imageFile = new File([blob], 'acne-girl.jpg', { type: 'image/jpeg' });
-        formData.append('image_file', imageFile);
-
-        try {
-            // 发送 POST 请求
-            const response = await axios.post('https://api-cn.faceplusplus.com/facepp/v1/skinanalyze_pro', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data', // 必须指定这个 Content-Type
-                },
-            });
-
-            console.log('Response:', response.data);
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    };
 
     return (
         <div className={"detection-page"}>
@@ -268,20 +237,11 @@ export const DetectionPage = () => {
                             ID:912839081283
                         </span>
                     </div>
-                    <AcneAnalyze imgUrl={imgUrl} data={mockData}/>
-                    <SkinAnalysis data={mockData.result}></SkinAnalysis>
+                    <AcneAnalyze imgUrl={capturedImage} data={responseData}/>
+                    <SkinAnalysis data={responseData.result}></SkinAnalysis>
                 </Content>
                 <Footer className="footer"></Footer>
             </Layout>
-            <Button onClick={
-                ()=> {
-                    sendFormData().then(res=>{
-                        console.log(res)
-                    })
-                }
-            }>
-                发请求
-            </Button>
         </div>
     )
         ;

@@ -3,6 +3,8 @@ import * as cv from '@techstark/opencv-js';
 import "./SnapshotPage.scss"
 import {Button, Layout} from "@douyinfe/semi-ui";
 import {IconCamera} from "@douyinfe/semi-icons";
+import axios from "axios";
+import {useNavigate} from "react-router-dom";
 
 const SnapshotPage = () => {
     const videoRef = useRef(null);
@@ -12,15 +14,17 @@ const SnapshotPage = () => {
     const [warning, setWarning] = useState('正在初始化摄像头和检测器，请稍候...');
     const [capturedImage, setCapturedImage] = useState(null); // Store captured image data
     const {Header, Content, Footer} = Layout
+    const navigate=useNavigate()
 
     useEffect(() => {
         const initialize = async () => {
             try {
-                setWarning('正在加载 OpenCV...');
-                await new Promise((resolve) => {
-                    cv['onRuntimeInitialized'] = resolve;
-                });
-
+                if (!cv.getBuildInformation) {
+                    setWarning('正在加载 OpenCV...');
+                    await new Promise((resolve) => {
+                        cv['onRuntimeInitialized'] = resolve;
+                    });
+                }
                 setWarning('正在加载人脸检测模型...');
                 await loadCascadeFile(); // Ensure the Haar Cascade file is loaded
 
@@ -38,7 +42,21 @@ const SnapshotPage = () => {
                 setWarning('初始化失败，请检查您的摄像头设置或尝试刷新页面');
             }
         };
+
         initialize();
+
+        // 清理资源
+        return () => {
+            if (videoRef.current && videoRef.current.srcObject) {
+                const stream = videoRef.current.srcObject;
+                const tracks = stream.getTracks();
+                tracks.forEach((track) => track.stop());
+            }
+            // 添加防护，避免 `videoRef.current` 为 `null` 的情况
+            if (videoRef.current) {
+                videoRef.current.srcObject = null;
+            }
+        };
     }, []);
 
     const startCamera = async () => {
@@ -48,14 +66,19 @@ const SnapshotPage = () => {
             }
 
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: {facingMode: 'user'},
+                video: { facingMode: 'user' },
             });
-            videoRef.current.srcObject = stream;
+
+            // 添加防护，避免 `videoRef.current` 为 `null`
+            if (videoRef.current) {
+                videoRef.current.srcObject = stream;
+            }
         } catch (err) {
             console.error('访问摄像头失败:', err.message);
             throw new Error('无法访问摄像头，请检查权限设置并确保您的设备有可用摄像头');
         }
     };
+
 
     const loadCascadeFile = async () => {
         const faceCascadeUrl = `${process.env.PUBLIC_URL}/haarcascade_frontalface_default.xml`;
@@ -203,6 +226,61 @@ const SnapshotPage = () => {
         setIsReadyToTakePhoto(false); // Hide the take photo button after taking a photo
     };
 
+    const resetCamera = async () => {
+        try {
+            setCapturedImage(null); // 清除捕获的图像
+            setIsReadyToTakePhoto(false); // 重置拍照按钮状态
+            await startCamera(); // 重新加载摄像头
+            setWarning('摄像头已重置，请重新调整您的位置');
+        } catch (error) {
+            console.error('重新加载摄像头失败:', error.message);
+            setWarning('无法重新加载摄像头，请刷新页面');
+        }
+    };
+
+    const sendFormData = async () => {
+        if (!capturedImage) {
+            console.error('没有拍摄的图片可发送');
+            return;
+        }
+
+        // 创建 FormData 实例
+        const formData = new FormData();
+
+        // 添加 API key 和 secret
+        formData.append('api_key', '3OArM8NmM2U01LOeRtsIsVkSGKiXgMHB');
+        formData.append('api_secret', 'HYwoEG6VYWYNQPX2YeuEFlnrMlC-ylDp');
+
+        try {
+            // 将 Base64 转换为 Blob
+            const base64Data = capturedImage.split(',')[1]; // 去掉 "data:image/png;base64," 部分
+            const byteCharacters = atob(base64Data);
+            const byteNumbers = new Array(byteCharacters.length).fill().map((_, i) => byteCharacters.charCodeAt(i));
+            const byteArray = new Uint8Array(byteNumbers);
+            const imageBlob = new Blob([byteArray], { type: 'image/png' });
+
+            // 创建一个 File 对象
+            const imageFile = new File([imageBlob], 'captured-image.png', { type: 'image/png' });
+            formData.append('image_file', imageFile);
+
+            // 发送 POST 请求
+            const response = await axios.post('https://api-cn.faceplusplus.com/facepp/v1/skinanalyze_pro', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data', // 必须指定这个 Content-Type
+                },
+            });
+            navigate('/detection-result', {
+                state: {
+                    responseData: response.data,
+                    capturedImage: capturedImage, // 添加图片数据
+                },
+            });
+            console.log('Response:', response.data);
+        } catch (error) {
+            console.error('Error sending image:', error);
+        }
+    };
+
 
     return (
         <div className={"snapshot-page"}>
@@ -226,8 +304,8 @@ const SnapshotPage = () => {
                             <h2>预览图片</h2>
                             <img src={capturedImage} alt="Captured preview" style={{width: '100%'}}/>
                             <div className="options">
-                                <Button>重新拍照</Button>
-                                <Button>就用这张!</Button>
+                                <Button onClick={()=>resetCamera()}>重新拍照</Button>
+                                <Button onClick={()=>sendFormData()} >就用这张!</Button>
                             </div>
                         </div>
                     )}

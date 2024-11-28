@@ -15,7 +15,7 @@ function App() {
     { path: '/', component: <FeedPage/>,index:0 },
       {path:'/history', component: <HistoryPage/>, index:1},
       {path:'/profile',component: <ProfilePage/>, index:2},
-      {path:'/detection-results', component:<DetectionPage/>,index:3},
+      {path:'/detection-result', component:<DetectionPage/>,index:3},
       {path:'/snapshot',component: <SnapshotPage/>,index:4},
     // {path:"/governmentCheckCarbonAmount",component: <CarbonAmountPage/>,index: 5}
   ];
