@@ -39,7 +39,7 @@ const SnapshotPage = () => {
                 return () => clearInterval(interval); // Cleanup on unmount
             } catch (error) {
                 console.error('初始化失败:', error.message);
-                setWarning('初始化失败，请检查您的摄像头设置或尝试刷新页面');
+                setWarning('初始化中，请稍作等待，若一直未初始化完成请尝试刷新页面');
             }
         };
 

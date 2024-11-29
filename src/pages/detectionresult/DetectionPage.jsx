@@ -12,7 +12,7 @@ export const AcneAnalyze = ({imgUrl, data}) => {
     const [currentDisplayData, setCurrentDisplayData] = useState("acne");
     const currentDisplayDataTitle = {
         acne: "痤疮",
-        brown_spot: "褐斑",
+        brown_spot: "色斑",
         acne_mark: "痘印",
         acne_pustule: "脓包"
     };
