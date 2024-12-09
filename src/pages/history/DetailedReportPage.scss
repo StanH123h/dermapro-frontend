@@ -1,0 +1,52 @@
+.detailed-report-page{
+  .header{
+    justify-content: left;
+  }
+  .content{
+    .report-info {
+      .result-id {
+        font-weight: 100;
+      }
+      margin-bottom: 4vh;
+    }
+    .acne-graph{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .dry-skin-analysis{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      .image{
+
+      }
+    }
+  }
+  .data-display-type-nav-bar{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.data-block{
+  .table{
+    .semi-table-colgroup {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .semi-table-row{
+      width: 100%;
+      display: flex;
+      align-items:center;
+      justify-content: space-between;
+      border-bottom: 1px #efefef solid;
+      *{
+        border:none;
+      }
+    }
+  }
+}

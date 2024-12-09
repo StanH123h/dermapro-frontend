@@ -1,4 +1,4 @@
-import "./DetectionPage.scss";
+import "./DetectionResultPage.scss";
 import { Layout, Table, TabPane, Tabs} from "@douyinfe/semi-ui";
 import {IconChevronLeft} from "@douyinfe/semi-icons";
 import {useEffect, useRef, useState} from "react";
@@ -147,7 +147,7 @@ const renderBlock = (blockTitle, columns, dataSource) => (
     </div>
 );
 
-const SkinAnalysis = ({ data }) => {
+export const SkinAnalysis = ({ data }) => {
     const basicInfoColumns = [
         { title: '项目', dataIndex: 'name' },
         { title: '值', dataIndex: 'value' },
@@ -217,7 +217,7 @@ const SkinAnalysis = ({ data }) => {
     );
 };
 
-export const DetectionPage = () => {
+export const DetectionResultPage = () => {
     const location=useLocation();
     const responseData=location.state?.responseData;
     const capturedImage=location.state?.capturedImage;

@@ -1,0 +1,38 @@
+.history-page{
+  .header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .content{
+    .history{
+      .semi-list-items{
+        display: flex;
+        flex-direction: column;
+        gap: 3vh;
+      }
+      .item{
+        background-color: #d9d9d9;
+        .avatar{
+          width: 20vw;
+          height:20vw
+        }
+        .info{
+          height: 20vw;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          align-items: start;
+        }
+      }
+    }
+    .insights{
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      .graph{
+      }
+    }
+  }
+}

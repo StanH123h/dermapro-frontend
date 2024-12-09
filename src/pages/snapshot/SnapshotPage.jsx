@@ -3,7 +3,7 @@ import * as cv from '@techstark/opencv-js';
 import "./SnapshotPage.scss"
 import {Button, Layout} from "@douyinfe/semi-ui";
 import {IconCamera} from "@douyinfe/semi-icons";
-import axios from "axios";
+import axiosInstance from "../../api/axiosInstance";
 import {useNavigate} from "react-router-dom";
 
 const SnapshotPage = () => {
@@ -83,7 +83,6 @@ const SnapshotPage = () => {
     const loadCascadeFile = async () => {
         const faceCascadeUrl = `${process.env.PUBLIC_URL}/haarcascade_frontalface_default.xml`;
         try {
-            console.log('正在尝试加载人脸检测模型：', faceCascadeUrl);
             const response = await fetch(faceCascadeUrl);
             if (!response.ok) {
                 throw new Error(`无法加载人脸检测模型: ${response.status} ${response.statusText}`);
@@ -91,9 +90,7 @@ const SnapshotPage = () => {
             const buffer = await response.arrayBuffer();
             const data = new Uint8Array(buffer);
             cv.FS_createDataFile('/', 'haarcascade_frontalface_default.xml', data, true, false, false);
-            console.log('人脸检测模型加载成功');
         } catch (error) {
-            console.warn('人脸检测模型加载失败:', error.message);
             throw new Error('人脸检测模型加载失败，请检查网络连接');
         }
     };
@@ -104,7 +101,6 @@ const SnapshotPage = () => {
                 throw new Error('CascadeClassifier 未在 OpenCV.js 中找到');
             }
             faceCascadeRef.current = new cv.CascadeClassifier('haarcascade_frontalface_default.xml');
-            console.log('人脸检测器初始化成功');
         } catch (error) {
             console.error('人脸检测器初始化失败:', error.message);
             throw new Error('人脸检测器初始化失败，请刷新页面');
@@ -261,21 +257,21 @@ const SnapshotPage = () => {
 
             // 创建一个 File 对象
             const imageFile = new File([imageBlob], 'captured-image.png', { type: 'image/png' });
-            formData.append('image_file', imageFile);
+            formData.append('file', imageFile);
 
             // 发送 POST 请求
-            const response = await axios.post('https://api-cn.faceplusplus.com/facepp/v1/skinanalyze_pro', formData, {
+            const response = await axiosInstance.post('/analysis/facialReport', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data', // 必须指定这个 Content-Type
                 },
             });
+            console.log(response.data)
             navigate('/detection-result', {
                 state: {
                     responseData: response.data,
                     capturedImage: capturedImage, // 添加图片数据
                 },
             });
-            console.log('Response:', response.data);
         } catch (error) {
             console.error('Error sending image:', error);
         }

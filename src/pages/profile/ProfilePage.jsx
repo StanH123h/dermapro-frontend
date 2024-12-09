@@ -1,41 +1,94 @@
-import {Avatar, Card, Layout} from "@douyinfe/semi-ui";
-import {BottomNavBar} from "../../components/BottomNavBar/BottomNavBar";
-import React from "react";
-import "./ProfilePage.scss"
-import {PhotoSnapButton} from "../../components/PhotoSnapButton";
+import { Avatar, Card, Layout, Toast } from "@douyinfe/semi-ui";
+import { BottomNavBar } from "../../components/BottomNavBar/BottomNavBar";
+import React, {useState, useRef, useEffect} from "react";
+import axiosInstance from "../../api/axiosInstance";
+import "./ProfilePage.scss";
+import { PhotoSnapButton } from "../../components/PhotoSnapButton";
+import {useNavigate} from "react-router-dom";
 
 export const ProfilePage = () => {
-    const {Header, Content, Footer} = Layout;
+    const [userInfo,setUserInfo] = useState({})
+    useEffect(() => {
+        axiosInstance.get("user/userInfo").then(
+            res=>{
+                setUserInfo(res.data)
+            }
+        )
+    }, []);
+    const navigate=useNavigate()
+    const { Header, Content, Footer } = Layout;
+    const [avatar, setAvatar] = useState(null); // 用于存储用户头像的 URL 或文件
+    const fileInputRef = useRef(null); // 引用文件输入框
+
+    const handleAvatarClick = () => {
+        fileInputRef.current.click(); // 模拟点击文件上传控件
+    };
+
+    const handleAvatarUpload = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+
+            const response = await axiosInstance.post("/user/uploadAvatar", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            if (response.status === 200) {
+                Toast.success("头像上传成功！");
+                setAvatar(URL.createObjectURL(file)); // 更新头像显示
+            }
+        } catch (error) {
+            Toast.error("头像上传失败，请稍后重试！");
+        }
+    };
+
     return (
-        <div className={"profile-page"}>
+        <div className="profile-page">
             <Layout>
-                <Header className={"header"}>
-                    <PhotoSnapButton/>
+                <Header className="header">
+                    <PhotoSnapButton />
                 </Header>
-                <Content className={"content"}>
+                <Content className="content">
                     <div className="user-name-and-avatar">
-                    <Avatar size="large" style={{margin: 4}} alt='User'>
-                        U
-                    </Avatar>
+                        <Avatar
+                            size="large"
+                            src={avatar}
+                            style={{ margin: 4, cursor: "pointer" }}
+                            alt="User Avatar"
+                            onClick={handleAvatarClick} // 点击头像触发文件选择
+                        >
+                            {avatar ? null : "U"}
+                        </Avatar>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            ref={fileInputRef}
+                            style={{ display: "none" }} // 隐藏文件输入框
+                            onChange={handleAvatarUpload}
+                        />
                         <h3>User</h3>
                     </div>
                     <div className="skin-history-and-trend">
-                        <Card className={"skin-trend"}>
+                        <Card onClick={()=>navigate("/history",{state:{dataType:"insight"}})} className="skin-trend">
                             <h4>肤质变化</h4>
-                            jdhahsdosahdoihasoihosah
                         </Card>
-                        <Card className={"skin-history"}>
+                        <Card onClick={()=>navigate("/history",{state:{dataType:"history"}})} className="skin-history">
                             <h4>肤质历史</h4>
-                            qowiduwqduiwq9d0uqw90duqw
                         </Card>
                     </div>
                     <Card className="my-skin-info">
-                        <h4>我的皮肤信息</h4>
-                        <br/>
-                        <h4>年龄</h4>
-                        <h4>肤质</h4>
-                        <h4>性别</h4>
-                        <br/>
+                        <h4>我的信息</h4>
+                        <br />
+                        <h4>年龄:{userInfo.age||"未填写"}</h4>
+                        <h4>邮箱:{userInfo.email||"未填写"}</h4>
+                        <h4>性别:{userInfo.gender||"未填写"}</h4>
+                        <h4>手机号:{userInfo.phoneNumber||"未填写"}</h4>
+                        <br />
                     </Card>
                     <Card className="my-footprint">
                         <h4>我的浏览足迹</h4>
@@ -44,10 +97,10 @@ export const ProfilePage = () => {
                         <h4>我收藏的文章</h4>
                     </Card>
                 </Content>
-                <Footer className={"footer"}>
-                    <BottomNavBar currentPage={"profile"}/>
+                <Footer className="footer">
+                    <BottomNavBar currentPage="profile" />
                 </Footer>
             </Layout>
         </div>
-    )
-}
+    );
+};

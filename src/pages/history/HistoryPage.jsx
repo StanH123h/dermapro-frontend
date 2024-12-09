@@ -1,21 +1,139 @@
-import {Layout} from "@douyinfe/semi-ui";
+import React, {useEffect, useState} from "react";
+import {Layout, List, Avatar, Typography} from "@douyinfe/semi-ui";
 import {BottomNavBar} from "../../components/BottomNavBar/BottomNavBar";
-import React from "react";
-
+import {IconChevronLeft} from "@douyinfe/semi-icons";
+import {useLocation, useNavigate} from "react-router-dom";
+import axiosInstance from "../../api/axiosInstance";
+import {LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer} from 'recharts';
+import "./HistoryPage.scss"
 
 export const HistoryPage = () => {
+    const location = useLocation();
+    const dataType = location.state?.dataType;
+    const [displayDataType, setDisplayDataType] = useState(dataType || "history");
+    const [historyData, setHistoryData] = useState([]); // 用于存储历史记录
+    const [loading, setLoading] = useState(true); // 加载状态
+    const navigate = useNavigate();
     const {Header, Content, Footer} = Layout;
+
+    // 获取历史数据
+    useEffect(() => {
+        const fetchHistory = async () => {
+            try {
+                const response = await axiosInstance.get("/analysis/getSkinAnalysisHistory", {
+                    headers: {
+                        "Content-Type": "application/form-data", // 确保 Content-Type 正确
+                    },
+                });
+                console.log(response.data)
+                // const response = {
+                //     data: [
+                //         {
+                //             "id": "12345",
+                //             "timeStamp": "2023-10-05T14:30:00.123456789",
+                //             "score": 85,
+                //             "imageKey": "image_12345.jpg"
+                //         },
+                //         {
+                //             "id": "12346",
+                //             "timeStamp": "2023-10-06T14:30:00.123456789",
+                //             "score": 75,
+                //             "imageKey": "image_12345.jpg"
+                //         },
+                //     ]
+                // };
+                setHistoryData(response.data); // 保存返回的数据
+            } catch (error) {
+                console.error("获取历史数据失败:", error);
+            } finally {
+                setLoading(false); // 无论成功或失败都停止加载
+            }
+        };
+        fetchHistory();
+    }, []);
+
+    // 将 historyData 转换为折线图所需的数据格式
+    const LineChartComponent = () => {
+        function formatDate(date) {
+            const month = date.getMonth() + 1;  // getMonth() 返回 0-11，所以要加 1
+            const day = date.getDate();         // getDate() 返回 1-31
+
+            return `${month}-${day}`;
+        }
+
+        const formattedData = historyData.map((item) => ({
+            date: formatDate(new Date(item.timeStamp)),  // 使用手动实现的格式化函数
+            score: item.score,
+        }));
+
+        return (
+            <ResponsiveContainer width="100%" height={300} className={"graph"}>
+                <LineChart data={formattedData}>
+                    <CartesianGrid strokeDasharray="3 3"/>
+                    <XAxis dataKey="date"/>
+                    <YAxis domain={[0, 100]}/>
+                    <Tooltip/>
+                    <Legend/>
+                    <Line type="monotone" dataKey="score" stroke="#8884d8" activeDot={{r: 8}}/>
+                </LineChart>
+            </ResponsiveContainer>
+        );
+    };
+
     return (
         <div className={"history-page"}>
             <Layout>
                 <Header className={"header"}>
+                    <span></span>
+                    <Typography.Title heading={6}>
+                        <a onClick={() => setDisplayDataType("history")}
+                           style={displayDataType === "history" ? {color: "#999"} : {color: "#007bff"}}>历史记录</a>
+                        /
+                        <a onClick={() => setDisplayDataType("insight")}
+                           style={displayDataType === "insight" ? {color: "#999"} : {color: "#007bff"}}>洞察</a>
+                    </Typography.Title>
+                    <span></span>
                 </Header>
                 <Content className={"content"}>
+                    {displayDataType === "history" ? (
+                        loading ? (
+                            <Typography.Text>加载中...</Typography.Text>
+                        ) : historyData.length > 0 ? (
+                            <List
+                                className={"history"}
+                                dataSource={historyData}
+                                renderItem={(item) => (
+                                    <List.Item
+                                        onClick={() => {
+                                            navigate(`/detailed-report-page?id=${item.id}`);
+                                        }}
+                                        className={"item"}
+                                        key={item.id}
+                                        header={<Avatar className={"avatar"} shape="square"/>}
+                                        main={
+                                            <div className={"info"}>
+                                                <Typography.Text strong>分数: {item.score}</Typography.Text>
+                                                <br/>
+                                                <Typography.Text>时间: {new Date(item.timeStamp).toLocaleString()}</Typography.Text>
+                                            </div>
+                                        }
+                                    />
+                                )}
+                            />
+                        ) : (
+                            <Typography.Text>暂无历史记录</Typography.Text>
+                        )
+                    ) : (
+                        <div className={"insights"}>
+                            <h3 className={"title"}>肤质得分变化</h3>
+                            <LineChartComponent/>
+                        </div>
+                    )}
                 </Content>
                 <Footer className={"footer"}>
                     <BottomNavBar currentPage={"history"}/>
                 </Footer>
             </Layout>
         </div>
-    )
-}
+    );
+};
