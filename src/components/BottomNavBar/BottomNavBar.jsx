@@ -1,6 +1,6 @@
-import {Nav} from "@douyinfe/semi-ui";
-import {Link} from "react-router-dom";
-import "./BottomNavBar.scss"
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import "./BottomNavBar.scss";
 import {
     IconFolder,
     IconFolderStroked,
@@ -9,31 +9,46 @@ import {
     IconUser,
     IconUserStroked
 } from "@douyinfe/semi-icons";
-export const BottomNavBar = ({currentPage}) => {
+
+export const BottomNavBar = ({ currentPage }) => {
+    const navigate = useNavigate();  // Initialize the navigate function
+
+    // Define a router map for the navigation
+    const routerMap = {
+        Home: "/",
+        HistoryData: "/history",
+        Profile: "/profile",
+    };
+
+    // Handle click on a navigation item
+    const handleNavClick = (page) => {
+        navigate(routerMap[page]); // Navigate to the corresponding route
+    };
+
     return (
-        <Nav
-            className={"bottom-nav-bar"}
-            mode={"horizontal"}
-            renderWrapper={({itemElement, isSubNav, isInSubNav, props}) => {
-                const routerMap = {
-                    Home: "/",
-                    HistoryData: "/history",
-                    Profile: "/profile",
-                };
-                return (
-                    <Link
-                        style={{textDecoration: "none"}}
-                        to={routerMap[props.itemKey]}
-                    >
-                        {itemElement}
-                    </Link>
-                );
-            }}
-            items={[
-                {itemKey: "HistoryData", icon: currentPage==="history"?<IconFolder/>:<IconFolderStroked/>},
-                {itemKey: "Home", icon: currentPage==="home"?<IconHome/>:<IconHomeStroked/>},
-                {itemKey: "Profile", icon: currentPage==="profile"?<IconUser/>:<IconUserStroked/>}
-            ]}
-        ></Nav>
-    )
-}
+        <div className="bottom-nav-bar">
+            {/* Bottom navigation items */}
+            <div
+                className="nav-item"
+                onClick={() => handleNavClick("HistoryData")}
+                style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+            >
+                {currentPage === "history" ? <IconFolder /> : <IconFolderStroked />}
+            </div>
+            <div
+                className="nav-item"
+                onClick={() => handleNavClick("Home")}
+                style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+            >
+                {currentPage === "home" ? <IconHome /> : <IconHomeStroked />}
+            </div>
+            <div
+                className="nav-item"
+                onClick={() => handleNavClick("Profile")}
+                style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+            >
+                {currentPage === "profile" ? <IconUser /> : <IconUserStroked />}
+            </div>
+        </div>
+    );
+};

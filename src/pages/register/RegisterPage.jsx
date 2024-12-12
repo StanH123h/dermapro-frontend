@@ -3,6 +3,7 @@ import { Form, Button, Toast } from '@douyinfe/semi-ui';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../api/axiosInstance';
 import './RegisterPage.scss';
+import {motion} from "framer-motion"
 
 const RegisterPage = () => {
     const [loading, setLoading] = useState(false);
@@ -85,24 +86,32 @@ const RegisterPage = () => {
                         ]}
                     />
                     <div className="register-actions">
-                        <Button
+                        <motion.button
                             htmlType="submit"
                             type="primary"
                             loading={loading}
                             className="register-button"
+                            initial={{height:"0vh",width:"0vw"}}
+                            animate={{height:"4vh",width:"100%",borderRadius:"1vw",border:"none"}}
+                            whileTap={{ scale: 0.8 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 25 }}
                         >
                             注册
-                        </Button>
+                        </motion.button>
                     </div>
                 </Form>
                 <div className="register-footer">
-                    <Button
+                    <motion.button
+                        initial={{height:"0vh"}}
+                        animate={{borderRadius:"1vw",border:"1px black solid",boxSizing:"border-box", height:"100%"}}
+                        whileTap={{ scale: 0.8 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
                         type="tertiary"
                         onClick={() => navigate('/login')}
                         className="login-button"
                     >
                         已有账号？去登录
-                    </Button>
+                    </motion.button>
                 </div>
             </div>
         </div>

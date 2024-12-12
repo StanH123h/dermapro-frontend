@@ -39,10 +39,11 @@
 *{
   padding: 0;
   margin: 0;
+  font-family: DouyinSansBold, sans-serif;
 }
 
 [class$="page"] {
-  margin: 0 4vw;
+  background-color: rgb(217, 211, 195) !important;
   .header{
     height: 6vh;
     display: flex;
@@ -50,6 +51,7 @@
     align-items: center;
   }
   .content{
+    padding: 0 4vw;
     height: 88vh;
     overflow: scroll;
   }

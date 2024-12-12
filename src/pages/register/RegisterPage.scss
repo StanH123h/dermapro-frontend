@@ -3,13 +3,10 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f5f5f5;
 
   .register-card {
-    background: #ffffff;
+    background-color: rgb(217, 211, 195);
     padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     width: 400px;
 
     .register-title {
@@ -24,6 +21,9 @@
 
       .register-button {
         width: 100%;
+        background-color: rgb(3, 3, 3);
+        color:white;
+
       }
     }
 
@@ -32,8 +32,6 @@
       text-align: center;
 
       .login-button {
-        text-decoration: underline;
-        color: #0070f3;
         &:hover {
           color: #005bb5;
         }

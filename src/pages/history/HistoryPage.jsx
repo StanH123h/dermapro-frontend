@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Layout, List, Avatar, Typography} from "@douyinfe/semi-ui";
 import {BottomNavBar} from "../../components/BottomNavBar/BottomNavBar";
-import {IconChevronLeft} from "@douyinfe/semi-icons";
+import {motion} from "framer-motion"
 import {useLocation, useNavigate} from "react-router-dom";
 import axiosInstance from "../../api/axiosInstance";
 import {LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer} from 'recharts';

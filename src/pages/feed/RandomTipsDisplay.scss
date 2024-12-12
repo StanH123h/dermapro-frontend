@@ -1,0 +1,36 @@
+.tips {
+  display: flex;
+  flex-direction: column;
+  gap: 3vh;
+
+
+  .tip {
+    position: relative;
+    box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    border-radius: 10px;
+    transition: box-shadow 0.3s ease-in-out;
+
+    /* Create the gradient mask at the bottom of the card */
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 75%; /* You can adjust the height of the gradient */
+      background: linear-gradient(to top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.1));
+      pointer-events: none; /* Ensures it doesn't interfere with the card content */
+      transition: height 0.3s ease-in-out; /* Smooth transition for the gradient mask */
+    }
+
+    /* Optional: Apply styles when expanded */
+    &.expanded::after {
+      height: 0; /* Remove the gradient mask when expanded */
+    }
+  }
+
+  .tip-preview {
+    margin-bottom: 15px;
+  }
+}

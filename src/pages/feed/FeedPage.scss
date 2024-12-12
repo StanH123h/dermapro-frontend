@@ -1,6 +1,31 @@
-.feed-page{
-    .search-bar{
-      width: 66vw;
+.feed-page {
+  .footer{
+    width: 100%;
+    background-color: black;
+  }
+  .search-bar-container {
+    display: flex;
+    position: relative;
+    align-items: center;
+    border-radius: 6vw;
+    background-color: rgba(0, 0, 0, 0.2);
+    height: 3vh;
+    padding-left: 10vw;
+    box-sizing: border-box;
+    .icon{
+      left: 1vw;
+      position: absolute;
+    }
+    .search-bar {
+      height: 100%;
+      width: 100%;
+      border: none;
+      background-color: transparent;
       border-radius: 6vw;
     }
+    input:focus {
+      outline: none;
+    }
+  }
+
 }
