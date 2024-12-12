@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";  // Import framer-motion
 import "./BottomNavBar.scss";
 import {
     IconFolder,
@@ -11,7 +12,7 @@ import {
 } from "@douyinfe/semi-icons";
 
 export const BottomNavBar = ({ currentPage }) => {
-    const navigate = useNavigate();  // Initialize the navigate function
+    const navigate = useNavigate();
 
     // Define a router map for the navigation
     const routerMap = {
@@ -25,30 +26,51 @@ export const BottomNavBar = ({ currentPage }) => {
         navigate(routerMap[page]); // Navigate to the corresponding route
     };
 
+    // Motion variants for scale effect
+    const scaleVariants = {
+        initial: { scale: 1 },
+        hover: { scale: 1.2 },  // Scale up on hover
+        selected: { scale: 1.2 },  // Scale up when selected
+    };
+
     return (
         <div className="bottom-nav-bar">
             {/* Bottom navigation items */}
-            <div
+            <motion.div
                 className="nav-item"
                 onClick={() => handleNavClick("HistoryData")}
                 style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+                initial="initial"
+                whileHover="hover"
+                animate={currentPage === "history" ? "selected" : "initial"}  // Apply scale effect if selected
+                variants={scaleVariants}  // Link the scale variants
             >
                 {currentPage === "history" ? <IconFolder /> : <IconFolderStroked />}
-            </div>
-            <div
+            </motion.div>
+
+            <motion.div
                 className="nav-item"
                 onClick={() => handleNavClick("Home")}
                 style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+                initial="initial"
+                whileHover="hover"
+                animate={currentPage === "home" ? "selected" : "initial"}
+                variants={scaleVariants}
             >
                 {currentPage === "home" ? <IconHome /> : <IconHomeStroked />}
-            </div>
-            <div
+            </motion.div>
+
+            <motion.div
                 className="nav-item"
                 onClick={() => handleNavClick("Profile")}
                 style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+                initial="initial"
+                whileHover="hover"
+                animate={currentPage === "profile" ? "selected" : "initial"}
+                variants={scaleVariants}
             >
                 {currentPage === "profile" ? <IconUser /> : <IconUserStroked />}
-            </div>
+            </motion.div>
         </div>
     );
 };

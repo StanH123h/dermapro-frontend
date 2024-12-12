@@ -46,14 +46,14 @@ export const LoginPage = () => {
                                            initial={{height:"0vh",width:"0vw"}} animate={{height:"4vh",width:"100%",borderRadius:"1vw",border:"none"}}
                                            whileTap={{ scale: 0.8 }}
                                           onClick={()=>setLoginOptionIsChoosed(true)}
-                                           transition={{ type: "spring", stiffness: 400, damping: 25 }}>
+                                           transition={{ type: "spring", stiffness: 400, damping: 30 }}>
                                 登录
                             </motion.button>
                             <motion.button className={"sign-up-button"}
                                            initial={{height:"0vh",width:"0vw"}}
                                            animate={{height:"4vh",width:"100%",borderRadius:"1vw",border:"1px black solid",boxSizing:"border-box"}}
                                            whileTap={{ scale: 0.8 }}
-                                           transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                           transition={{ type: "spring", stiffness: 400, damping: 30 }}
                                            onClick={()=>navigate("/register")}
                             >
                                 注册
@@ -94,7 +94,7 @@ export const LoginPage = () => {
                                     initial={{height:"0vh",width:"0vw"}} animate={{height:"4vh",width:"100%",borderRadius:"1vw",border:"none"}}
                                     whileTap={{ scale: 0.8 }}
                                     onClick={()=>setLoginOptionIsChoosed(true)}
-                                    transition={{ type: "spring", stiffness: 400, damping: 25 }}>
+                                    transition={{ type: "spring", stiffness: 400, damping: 30 }}>
                                     登录
                                 </motion.button>
                             </div>
@@ -103,7 +103,7 @@ export const LoginPage = () => {
                             <motion.button
                                 type="tertiary"
                                 whileTap={{ scale: 0.8 }}
-                                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                transition={{ type: "spring", stiffness: 400, damping: 30 }}
                                 onClick={()=>navigate('/register')}
                                 className="register-button"
                             >
