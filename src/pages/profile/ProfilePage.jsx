@@ -3,17 +3,29 @@ import { BottomNavBar } from "../../components/BottomNavBar/BottomNavBar";
 import React, {useState, useRef, useEffect} from "react";
 import axiosInstance from "../../api/axiosInstance";
 import "./ProfilePage.scss";
-import { PhotoSnapButton } from "../../components/PhotoSnapButton";
 import {useNavigate} from "react-router-dom";
+import {motion} from "framer-motion"
 
 export const ProfilePage = () => {
     const [userInfo,setUserInfo] = useState({})
     useEffect(() => {
-        axiosInstance.get("user/userInfo").then(
-            res=>{
-                setUserInfo(res.data)
+        const res = {
+            data:{
+
+                "name": "knknknk",
+                "phoneNumber": "bjbjbjbjbjj",
+                "email": "1735443634@qq.com",
+                "age": 0,
+                "avatar": null,
+                "gender": 0
             }
-        )
+        }
+        // axiosInstance.get("user/userInfo").then(
+        //     res=>{
+        //         setUserInfo(res.data)
+        //     }
+        // )
+        setUserInfo(res.data)
     }, []);
     const navigate=useNavigate()
     const { Header, Content, Footer } = Layout;
@@ -51,30 +63,36 @@ export const ProfilePage = () => {
         <div className="profile-page">
             <Layout>
                 <Header className="header">
-                    <PhotoSnapButton />
                 </Header>
                 <Content className="content">
-                    <div className="user-name-and-avatar">
-                        <Avatar
-                            size="large"
-                            src={avatar}
-                            style={{ margin: 4, cursor: "pointer" }}
-                            alt="User Avatar"
-                            onClick={handleAvatarClick} // 点击头像触发文件选择
-                        >
-                            {avatar ? null : "U"}
-                        </Avatar>
-                        <input
+                    <div className="user-name-and-avatar-and-email">
+                        <motion.div className="avatar" initial={{ opacity: 0, scale: 0 }}
+                                    animate={{ opacity: 1, scale: 1 }}>
+                            <Avatar
+                                size="large"
+                                src={avatar}
+                                style={{margin: 4, cursor: "pointer"}}
+                                alt="User Avatar"
+                                onClick={handleAvatarClick} // 点击头像触发文件选择
+                            >
+                                {avatar ? null : "U"}
+                            </Avatar> <input
                             type="file"
                             accept="image/*"
                             ref={fileInputRef}
-                            style={{ display: "none" }} // 隐藏文件输入框
+                            style={{display: "none"}} // 隐藏文件输入框
                             onChange={handleAvatarUpload}
                         />
-                        <h3>User</h3>
+                        </motion.div>
+                        <div className="text">
+                            <motion.h3 initial={{ opacity: 0, scale: 0 }}
+                                       animate={{ opacity: 1, scale: 1 }}>User</motion.h3>
+                            <motion.div initial={{ opacity: 0, scale: 0 }}
+                                        animate={{ opacity: 1, scale: 1 }} className="email">{userInfo.email}</motion.div>
+                        </div>
                     </div>
                     <div className="skin-history-and-trend">
-                        <Card onClick={()=>navigate("/history",{state:{dataType:"insight"}})} className="skin-trend">
+                    <Card onClick={()=>navigate("/history",{state:{dataType:"insight"}})} className="skin-trend">
                             <h4>肤质变化</h4>
                         </Card>
                         <Card onClick={()=>navigate("/history",{state:{dataType:"history"}})} className="skin-history">
@@ -85,7 +103,6 @@ export const ProfilePage = () => {
                         <h4>我的信息</h4>
                         <br />
                         <h4>年龄:{userInfo.age||"未填写"}</h4>
-                        <h4>邮箱:{userInfo.email||"未填写"}</h4>
                         <h4>性别:{userInfo.gender||"未填写"}</h4>
                         <h4>手机号:{userInfo.phoneNumber||"未填写"}</h4>
                         <br />

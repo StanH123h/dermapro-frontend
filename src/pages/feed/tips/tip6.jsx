@@ -3,7 +3,7 @@ import React from 'react';
 export const Tip6Preview = () => {
     return (
         <div className="tip-preview">
-            <h2>【拼多多护肤秘籍】如何高效选购护肤品，省钱又靠谱？</h2>
+            <h2>[拼多多护肤秘籍]如何高效选购护肤品，省钱又靠谱？</h2>
             <p>
                 你是否常常在拼多多上浏览护肤品，但不知道从哪里开始？拼多多作为一个拥有庞大商品种类的平台，提供了丰富的护肤品选择。
             </p>

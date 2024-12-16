@@ -3,7 +3,7 @@ import React from 'react';
 export const Tip5Preview = () => {
     return (
         <div className="tip-preview">
-            <h2>【揭秘】烟酰胺竟有这些你不知道的护肤功效！</h2>
+            <h2>[揭秘]烟酰胺竟有这些你不知道的护肤功效！</h2>
             <p>
                 烟酰胺（Niacinamide），也被称为维生素B3，是近几年在护肤圈内备受追捧的明星成分。你可能在很多护肤产品的成分表中见到过它，但你真的了解它的强大功效吗？
             </p>

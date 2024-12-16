@@ -6,22 +6,28 @@
     display: flex;
     flex-direction: column;
     gap: 5vh;
-    .user-name-and-avatar{
+    .user-name-and-avatar-and-email{
       display: flex;
       align-items: center;
       gap: 5vw;
+      .text{
+        .email{
+          color:rgb(169, 169, 169);
+          text-decoration: underline;
+        }
+      }
     }
     .skin-history-and-trend{
       display: flex;
       justify-content: space-between;
       .skin-trend,.skin-history{
-        background-color: rgb(217, 217, 217);
+        background-color: rgb(190,180,160);
         width: 45vw;
         word-break: break-all;
       }
     }
     .my-skin-info,.my-subscribes,.my-footprint{
-      background-color: rgb(217, 217, 217);
+      background-color: rgb(190,180,160);
     }
   }
   .footer{

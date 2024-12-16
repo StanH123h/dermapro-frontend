@@ -94,7 +94,7 @@ const RegisterPage = () => {
                             initial={{height:"0vh",width:"0vw"}}
                             animate={{height:"4vh",width:"100%",borderRadius:"1vw",border:"none"}}
                             whileTap={{ scale: 0.8 }}
-                            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 35 }}
                         >
                             注册
                         </motion.button>
@@ -105,7 +105,7 @@ const RegisterPage = () => {
                         initial={{height:"0vh"}}
                         animate={{borderRadius:"1vw",border:"1px black solid",boxSizing:"border-box", height:"100%"}}
                         whileTap={{ scale: 0.8 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 35 }}
                         type="tertiary"
                         onClick={() => navigate('/login')}
                         className="login-button"

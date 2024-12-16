@@ -32,6 +32,10 @@
 
 .data-block{
   .table{
+    background-color: transparent;
+    *{
+      background-color: transparent;
+    }
     .semi-table-colgroup {
       width: 100%;
       display: flex;
@@ -39,11 +43,14 @@
       justify-content: space-between;
     }
     .semi-table-row{
+      *{
+        background-color: transparent;
+      }
       width: 100%;
       display: flex;
       align-items:center;
       justify-content: space-between;
-      border-bottom: 1px #efefef solid;
+      border-bottom: 1px black solid;
       *{
         border:none;
       }

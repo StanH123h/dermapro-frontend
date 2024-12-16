@@ -6,6 +6,7 @@ import {useLocation, useNavigate} from "react-router-dom";
 import axiosInstance from "../../api/axiosInstance";
 import {LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer} from 'recharts';
 import "./HistoryPage.scss"
+import {PhotoSnapButton} from "../../components/PhotoSnapButton/PhotoSnapButton";
 
 export const HistoryPage = () => {
     const location = useLocation();
@@ -20,28 +21,52 @@ export const HistoryPage = () => {
     useEffect(() => {
         const fetchHistory = async () => {
             try {
-                const response = await axiosInstance.get("/analysis/getSkinAnalysisHistory", {
-                    headers: {
-                        "Content-Type": "application/form-data", // 确保 Content-Type 正确
-                    },
-                });
-                console.log(response.data)
-                // const response = {
-                //     data: [
-                //         {
-                //             "id": "12345",
-                //             "timeStamp": "2023-10-05T14:30:00.123456789",
-                //             "score": 85,
-                //             "imageKey": "image_12345.jpg"
-                //         },
-                //         {
-                //             "id": "12346",
-                //             "timeStamp": "2023-10-06T14:30:00.123456789",
-                //             "score": 75,
-                //             "imageKey": "image_12345.jpg"
-                //         },
-                //     ]
-                // };
+                // const response = await axiosInstance.get("/analysis/getSkinAnalysisHistory", {
+                //     headers: {
+                //         "Content-Type": "application/form-data", // 确保 Content-Type 正确
+                //     },
+                // });
+                // console.log(response.data)
+                const response = {
+                    data: [
+                        {
+                            "id": "12345",
+                            "timeStamp": "2023-10-05T14:30:00.123456789",
+                            "score": 85,
+                            "imageKey": "image_12345.jpg"
+                        },
+                        {
+                            "id": "12346",
+                            "timeStamp": "2023-10-06T14:30:00.123456789",
+                            "score": 75,
+                            "imageKey": "image_12345.jpg"
+                        },
+                        {
+                            "id": "12346",
+                            "timeStamp": "2023-10-07T14:30:00.123456789",
+                            "score": 5,
+                            "imageKey": "image_12345.jpg"
+                        },
+                        {
+                            "id": "12346",
+                            "timeStamp": "2023-10-08T14:30:00.123456789",
+                            "score": 35,
+                            "imageKey": "image_12345.jpg"
+                        },
+                        {
+                            "id": "12346",
+                            "timeStamp": "2023-10-09T14:30:00.123456789",
+                            "score": 30,
+                            "imageKey": "image_12345.jpg"
+                        },
+                        {
+                            "id": "12346",
+                            "timeStamp": "2023-10-10T14:30:00.123456789",
+                            "score": 100,
+                            "imageKey": "image_12345.jpg"
+                        },
+                    ]
+                };
                 setHistoryData(response.data); // 保存返回的数据
             } catch (error) {
                 console.error("获取历史数据失败:", error);
@@ -103,21 +128,24 @@ export const HistoryPage = () => {
                                 className={"history"}
                                 dataSource={historyData}
                                 renderItem={(item) => (
-                                    <List.Item
-                                        onClick={() => {
-                                            navigate(`/detailed-report-page?id=${item.id}`);
-                                        }}
-                                        className={"item"}
-                                        key={item.id}
-                                        header={<Avatar className={"avatar"} shape="square"/>}
-                                        main={
-                                            <div className={"info"}>
-                                                <Typography.Text strong>分数: {item.score}</Typography.Text>
-                                                <br/>
-                                                <Typography.Text>时间: {new Date(item.timeStamp).toLocaleString()}</Typography.Text>
-                                            </div>
-                                        }
-                                    />
+                                    <motion.div initial={{ opacity: 0, scale: 0 }}
+                                                animate={{ opacity: 1, scale: 1 }}>
+                                        <List.Item
+                                            onClick={() => {
+                                                navigate(`/detailed-report-page?id=${item.id}`);
+                                            }}
+                                            className={"item"}
+                                            key={item.id}
+                                            header={<Avatar className={"avatar"} shape="square"/>}
+                                            main={
+                                                <div className={"info"}>
+                                                    <Typography.Text strong>分数: {item.score}</Typography.Text>
+                                                    <br/>
+                                                    <Typography.Text>时间: {new Date(item.timeStamp).toLocaleString()}</Typography.Text>
+                                                </div>
+                                            }
+                                        />
+                                    </motion.div>
                                 )}
                             />
                         ) : (
