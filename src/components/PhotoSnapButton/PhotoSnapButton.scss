@@ -4,7 +4,7 @@
   right: 8vw;
   width: 15vw;   // 按钮宽度
   height: 15vw;  // 按钮高度
-  background-color: #f38f00;  // 橙色背景
+  background-color: rgba(243,143,0,1);  // 橙色背景
   border-radius: 50%;  // 圆形按钮
   display: flex;
   justify-content: center;
@@ -12,6 +12,9 @@
   cursor: pointer;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);  // 按钮阴影
   z-index: 9999;
+  &:hover{
+    background-color: rgb(243,143,0);
+  }
 }
 
 .icon {

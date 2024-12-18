@@ -2,27 +2,30 @@
   display: flex;
   flex-direction: column;
   gap: 3vh;
-
+  padding-bottom: 10vh;
 
   .tip {
     position: relative;
-    box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.1);
-    background-color: white;
+    box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.2); // 增加阴影模糊度和透明度
+    background-color: rgb(255, 255, 255);
     border-radius: 10px;
     transition: box-shadow 0.3s ease-in-out;
 
-    /* Create the gradient mask at the bottom of the card */
+    /* 创建更强烈的渐变遮罩 */
     &::after {
       content: '';
       position: absolute;
       bottom: 0;
       left: 0;
       right: 0;
-      height: 75%; /* You can adjust the height of the gradient */
-      background: linear-gradient(to top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.1));
-      pointer-events: none; /* Ensures it doesn't interfere with the card content */
-      transition: height 0.3s ease-in-out; /* Smooth transition for the gradient mask */
+      height: 75%; /* 可以保持或微调 */
+      background: linear-gradient(to top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.1)); // 增加透明部分的不透明度，产生更强烈的朦胧效果
+      transition: height 0.3s ease-in-out; /* 平滑的渐变遮罩过渡 */
+      &:hover {
+        box-shadow: 2px 6px 15px rgba(0, 0, 0, 0.3); /* 鼠标悬停时增强阴影 */
+      }
     }
+
 
     /* Optional: Apply styles when expanded */
     &.expanded::after {

@@ -31,25 +31,25 @@ export const HistoryPage = () => {
                     data: [
                         {
                             "id": "12345",
-                            "timeStamp": "2023-10-05T14:30:00.123456789",
+                            "timeStamp": "2024-12-18T09:30:00.123456789",
                             "score": 85,
                             "imageKey": "image_12345.jpg"
                         },
                         {
                             "id": "12346",
-                            "timeStamp": "2023-10-06T14:30:00.123456789",
+                            "timeStamp": "2024-12-17T14:30:00.123456789",
                             "score": 75,
                             "imageKey": "image_12345.jpg"
                         },
                         {
                             "id": "12346",
-                            "timeStamp": "2023-10-07T14:30:00.123456789",
+                            "timeStamp": "2024-11-07T14:30:00.123456789",
                             "score": 5,
                             "imageKey": "image_12345.jpg"
                         },
                         {
                             "id": "12346",
-                            "timeStamp": "2023-10-08T14:30:00.123456789",
+                            "timeStamp": "2024-10-08T14:30:00.123456789",
                             "score": 35,
                             "imageKey": "image_12345.jpg"
                         },
@@ -77,8 +77,30 @@ export const HistoryPage = () => {
         fetchHistory();
     }, []);
 
+    const formatHistoryTime = (timestamp) => {
+        const now = new Date();
+        const time = new Date(timestamp);
+        const diff = now - time;
+
+        const minutes = Math.floor(diff / (1000 * 60));
+        if (minutes < 60) return `${minutes} 分钟前`;
+
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        if (hours < 24) return `${hours} 小时前`;
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        if (days < 30) return `${days} 天前`;
+
+        const months = Math.floor(diff / (1000 * 60 * 60 * 24 * 30));
+        if (months < 12) return `${months} 月前`;
+
+        const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
+        return `${years} 年前`;
+    };
+
     // 将 historyData 转换为折线图所需的数据格式
     const LineChartComponent = () => {
+
         function formatDate(date) {
             const month = date.getMonth() + 1;  // getMonth() 返回 0-11，所以要加 1
             const day = date.getDate();         // getDate() 返回 1-31
@@ -139,9 +161,9 @@ export const HistoryPage = () => {
                                             header={<Avatar className={"avatar"} shape="square"/>}
                                             main={
                                                 <div className={"info"}>
-                                                    <Typography.Text strong>分数: {item.score}</Typography.Text>
+                                                    <Typography.Text className={"score"} ><span></span> <span className="value">{item.score}分</span></Typography.Text>
                                                     <br/>
-                                                    <Typography.Text>时间: {new Date(item.timeStamp).toLocaleString()}</Typography.Text>
+                                                    <Typography.Text className={"time"}> <span className="value">{formatHistoryTime(item.timeStamp)}</span> </Typography.Text>
                                                 </div>
                                             }
                                         />

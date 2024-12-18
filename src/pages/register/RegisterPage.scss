@@ -32,6 +32,10 @@
       text-align: center;
 
       .login-button {
+        background-color: transparent;
+        border: none !important;
+        color: gray;
+        text-decoration: underline;
         &:hover {
           color: #005bb5;
         }

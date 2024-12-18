@@ -108,10 +108,10 @@ export const ProfilePage = () => {
                         <br />
                     </Card>
                     <Card className="my-footprint">
-                        <h4>我的浏览足迹</h4>
+                        <h4>用户手册</h4>
                     </Card>
                     <Card className="my-subscribes">
-                        <h4>我收藏的文章</h4>
+                        <h4>常见问题</h4>
                     </Card>
                 </Content>
                 <Footer className="footer">
