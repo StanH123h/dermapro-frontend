@@ -7,25 +7,30 @@ import {useNavigate} from "react-router-dom";
 import {motion} from "framer-motion"
 
 export const ProfilePage = () => {
+    const GENDER={
+        0:"男性",
+        1:"女性",
+        2:"其他"
+    }
     const [userInfo,setUserInfo] = useState({})
     useEffect(() => {
-        const res = {
-            data:{
-
-                "name": "knknknk",
-                "phoneNumber": "bjbjbjbjbjj",
-                "email": "1735443634@qq.com",
-                "age": 0,
-                "avatar": null,
-                "gender": 0
-            }
-        }
-        // axiosInstance.get("user/userInfo").then(
-        //     res=>{
-        //         setUserInfo(res.data)
+        // const res = {
+        //     data:{
+        //
+        //         "name": "knknknk",
+        //         "phoneNumber": "bjbjbjbjbjj",
+        //         "email": "1735443634@qq.com",
+        //         "age": 0,
+        //         "avatar": null,
+        //         "gender": 0
         //     }
-        // )
-        setUserInfo(res.data)
+        // }
+        axiosInstance.get("user/userInfo").then(
+            res=>{
+                setUserInfo(res.data)
+            }
+        )
+        // setUserInfo(res.data)
     }, []);
     const navigate=useNavigate()
     const { Header, Content, Footer } = Layout;
@@ -70,12 +75,11 @@ export const ProfilePage = () => {
                                     animate={{ opacity: 1, scale: 1 }}>
                             <Avatar
                                 size="large"
-                                src={avatar}
+                                src={`https://www.fuzhi.space/${userInfo.avatar}`}
                                 style={{margin: 4, cursor: "pointer"}}
                                 alt="User Avatar"
                                 onClick={handleAvatarClick} // 点击头像触发文件选择
                             >
-                                {avatar ? null : "U"}
                             </Avatar> <input
                             type="file"
                             accept="image/*"
@@ -86,7 +90,7 @@ export const ProfilePage = () => {
                         </motion.div>
                         <div className="text">
                             <motion.h3 initial={{ opacity: 0, scale: 0 }}
-                                       animate={{ opacity: 1, scale: 1 }}>User</motion.h3>
+                                       animate={{ opacity: 1, scale: 1 }}>{userInfo.name}</motion.h3>
                             <motion.div initial={{ opacity: 0, scale: 0 }}
                                         animate={{ opacity: 1, scale: 1 }} className="email">{userInfo.email}</motion.div>
                         </div>
@@ -103,7 +107,7 @@ export const ProfilePage = () => {
                         <h4>我的信息</h4>
                         <br />
                         <h4>年龄:{userInfo.age||"未填写"}</h4>
-                        <h4>性别:{userInfo.gender||"未填写"}</h4>
+                        <h4>性别:{GENDER[userInfo.gender]||"未填写"}</h4>
                         <h4>手机号:{userInfo.phoneNumber||"未填写"}</h4>
                         <br />
                     </Card>

@@ -8,6 +8,18 @@
     background-color: black;
   }
   .content{
+    .no-data-container{
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      .no-data{
+        width: 20vw;
+        height: 20vw;
+      }
+    }
     .history{
       .semi-list-items{
         display: flex;
@@ -31,7 +43,7 @@
           .score{
             width: 50vw;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             font-size: 5vw;
             font-weight: bolder;
             line-height: 100%;
@@ -52,7 +64,7 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       .graph{
       }
     }

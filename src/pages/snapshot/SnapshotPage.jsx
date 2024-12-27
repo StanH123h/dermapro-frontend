@@ -15,6 +15,7 @@ const SnapshotPage = () => {
     const [capturedImage, setCapturedImage] = useState(null); // Store captured image data
     const {Header, Content, Footer} = Layout
     const navigate=useNavigate()
+    const [isButtonDisabled, setIsButtonDisabled] = useState(false)
 
     useEffect(() => {
         const initialize = async () => {
@@ -243,10 +244,6 @@ const SnapshotPage = () => {
         // 创建 FormData 实例
         const formData = new FormData();
 
-        // 添加 API key 和 secret
-        formData.append('api_key', '3OArM8NmM2U01LOeRtsIsVkSGKiXgMHB');
-        formData.append('api_secret', 'HYwoEG6VYWYNQPX2YeuEFlnrMlC-ylDp');
-
         try {
             // 将 Base64 转换为 Blob
             const base64Data = capturedImage.split(',')[1]; // 去掉 "data:image/png;base64," 部分
@@ -300,8 +297,11 @@ const SnapshotPage = () => {
                             <h2>预览图片</h2>
                             <img src={capturedImage} alt="Captured preview" style={{width: '100%'}}/>
                             <div className="options">
-                                <Button onClick={()=>resetCamera()}>重新拍照</Button>
-                                <Button onClick={()=>sendFormData()} >就用这张!</Button>
+                                <Button onClick={()=>resetCamera()} disabled={isButtonDisabled}>重新拍照</Button>
+                                <Button onClick={()=>{
+                                    sendFormData()
+                                    setIsButtonDisabled(true)
+                                }} disabled={isButtonDisabled}>就用这张!</Button>
                             </div>
                         </div>
                     )}
