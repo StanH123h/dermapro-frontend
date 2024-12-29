@@ -16,6 +16,7 @@ const SnapshotPage = () => {
     const {Header, Content, Footer} = Layout
     const navigate=useNavigate()
     const [isButtonDisabled, setIsButtonDisabled] = useState(false)
+    const [videoLoaded,setVideoLoaded]=useState(false);
 
     useEffect(() => {
         const initialize = async () => {
@@ -67,7 +68,12 @@ const SnapshotPage = () => {
             }
 
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'user' },
+                video: {
+                    facingMode: 'user',
+                    width: { ideal: 1000 }, // 请求理想宽度
+                    height: { ideal: 1700 }, // 请求理想高度
+                },
+                audio: false, // 如果不需要音频，可以禁用
             });
 
             // 添加防护，避免 `videoRef.current` 为 `null`
@@ -154,7 +160,7 @@ const SnapshotPage = () => {
             cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
 
             // Blur detection
-            const blurThreshold = 75;
+            const blurThreshold =0;
             let laplacian = new cv.Mat();
             cv.Laplacian(gray, laplacian, cv.CV_64F);
 
@@ -183,8 +189,8 @@ const SnapshotPage = () => {
                 isValid = false;
             } else {
                 const face = faces.get(0);
-                const minFaceWidth = canvas.width * 0.3;
-                const minFaceHeight = canvas.height * 0.3;
+                const minFaceWidth = canvas.width * 0.4;
+                const minFaceHeight = canvas.height * 0.5;
 
                 if (face.width < minFaceWidth || face.height < minFaceHeight) {
                     setWarning('人脸过小或未完全显示，请调整位置');
@@ -221,6 +227,14 @@ const SnapshotPage = () => {
         const imageDataUrl = canvas.toDataURL('image/png'); // Capture the current frame as a base64 image
         setCapturedImage(imageDataUrl); // Store the captured image for preview
         setIsReadyToTakePhoto(false); // Hide the take photo button after taking a photo
+
+        // 关闭摄像头
+        if (videoRef.current && videoRef.current.srcObject) {
+            const stream = videoRef.current.srcObject;
+            const tracks = stream.getTracks();
+            tracks.forEach((track) => track.stop());
+            videoRef.current.srcObject = null; // 清空 video 的源
+        }
     };
 
     const resetCamera = async () => {
@@ -282,14 +296,47 @@ const SnapshotPage = () => {
                 <Content className={"content"}>
                     {!capturedImage ? (
                         <div className={"photo-taking"}>
-                            <button className={"button"} onClick={takePhoto}
+                            <Button className={"button"} onClick={takePhoto}
                                     style={{backgroundColor: isReadyToTakePhoto ? "blanchedalmond" : "gray"}}
                                     disabled={!isReadyToTakePhoto}
-                            ><IconCamera/></button>
-                            <video className={"video"} ref={videoRef} autoPlay playsInline width="640"
-                                   height="480"/>
-                            <canvas ref={canvasRef} style={{display: 'none'}}></canvas>
-                            <h1>{getWarningMessage()}</h1>
+                                    icon={<IconCamera />}
+                            > {isReadyToTakePhoto ? '拍照' : getWarningMessage()}</Button>
+                            <div className="video-container" style={{position: 'relative'}}>
+                                <video ref={videoRef} autoPlay width="100%" height="auto"
+                                       onLoadedData={() => setVideoLoaded(true)}/>
+                                {videoLoaded ? (
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 100 100"
+                                        style={{
+                                            position: 'absolute',
+                                            top: '50%',
+                                            left: '50%',
+                                            transform: 'translate(-50%, -50%)',
+                                            pointerEvents: 'none',
+                                            width: '100%',  // 调整 SVG 的宽度以增大椭圆
+                                            height: '100%', // 调整 SVG 的高度以增大椭圆
+                                            zIndex: 2,
+                                        }}
+                                    >
+                                        <ellipse
+                                            cx="50"
+                                            cy="50"
+                                            rx="40.5"  // 增加宽度半径
+                                            ry="57"  // 增加高度半径，保持 2:1 比例
+                                            fill="none"
+                                            stroke="white"
+                                            strokeWidth="2"
+                                            strokeDasharray="5,5" // 使线条为虚线
+                                        />
+                                    </svg>
+
+                                ) : <></>}
+
+                                <canvas ref={canvasRef} style={{display: 'none'}}></canvas>
+                                {/*<h1>{getWarningMessage()}</h1>*/}
+                            </div>
+
 
                         </div>
                     ) : (
@@ -297,8 +344,9 @@ const SnapshotPage = () => {
                             <h2>预览图片</h2>
                             <img src={capturedImage} alt="Captured preview" style={{width: '100%'}}/>
                             <div className="options">
-                                <Button onClick={()=>resetCamera()} disabled={isButtonDisabled}>重新拍照</Button>
-                                <Button onClick={()=>{
+                                <Button onClick={() => resetCamera()} disabled={isButtonDisabled}>重新拍照</Button>
+                                <Button onClick={() => {
+                                    localStorage.setItem("historyCacheTimestamp", "1000000000000")
                                     sendFormData()
                                     setIsButtonDisabled(true)
                                 }} disabled={isButtonDisabled}>就用这张!</Button>

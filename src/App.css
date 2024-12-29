@@ -45,6 +45,7 @@
 [class$="page"] {
   background-color: rgb(217, 211, 195) !important;
   .header{
+    padding: 0 4vw;
     height: 6vh;
     display: flex;
     justify-content: center;

@@ -5,7 +5,7 @@ import axios from 'axios';
 // 创建 Axios 实例
 const axiosInstance = axios.create({
     baseURL: 'http://81.70.219.168:8080',
-    timeout: 10000,
+    timeout: 100000,
 });
 
 // 添加请求拦截器

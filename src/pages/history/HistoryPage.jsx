@@ -1,3 +1,4 @@
+// HistoryPage.jsx
 import React, { useEffect, useRef, useState } from "react";
 import { Layout, List, Avatar, Typography } from "@douyinfe/semi-ui";
 import { BottomNavBar } from "../../components/BottomNavBar/BottomNavBar";
@@ -6,46 +7,58 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axiosInstance";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import "./HistoryPage.scss";
-import { PhotoSnapButton } from "../../components/PhotoSnapButton/PhotoSnapButton";
 
 export const HistoryPage = () => {
     const location = useLocation();
     const dataType = location.state?.dataType;
     const [displayDataType, setDisplayDataType] = useState(dataType || "insight");
-    const [historyData, setHistoryData] = useState([]); // Set initial state as an empty array
-    const [loading, setLoading] = useState(true); // Loading state
+    const [historyData, setHistoryData] = useState([]); // 初始状态为空数组
+    const [loading, setLoading] = useState(true); // 加载状态
     const navigate = useNavigate();
     const { Header, Content, Footer } = Layout;
-    const historySectionRef = useRef(null); // Ref for scrolling
+    const historySectionRef = useRef(null); // 用于滚动的 Ref
 
-    // Fetch historical data
     useEffect(() => {
         const fetchHistory = async () => {
+            const cachedData = localStorage.getItem("historyData");
+            const cacheTimestamp = localStorage.getItem("historyCacheTimestamp");
+            const now = Date.now();
+
+            // 检查缓存是否存在且不过期（例如：缓存时间小于30分钟）
+            if (cachedData && cacheTimestamp && now - cacheTimestamp < 30 * 60 * 1000) {
+                setHistoryData(JSON.parse(cachedData));
+                setLoading(false);
+                return;
+            }
+
             try {
                 const response = await axiosInstance.get("/analysis/getSkinAnalysisHistory", {
                     headers: {
-                        "Content-Type": "application/form-data", // Ensure Content-Type is correct
+                        "Content-Type": "application/form-data",
                     },
                 });
-                console.log(response.data);
-                // Ensure the data is an array
-                if (Array.isArray(response.data)) {
-                    setHistoryData(response.data); // Set the data if it's an array
+
+                if (Array.isArray(response.data.data)) {
+                    setHistoryData(response.data.data);
+                    // 存储数据到缓存中
+                    localStorage.setItem("historyData", JSON.stringify(response.data.data));
+                    localStorage.setItem("historyCacheTimestamp", now.toString());
                 } else {
                     console.error("Returned data is not an array");
-                    setHistoryData([]); // Set as an empty array if data is not valid
+                    setHistoryData([]);
                 }
             } catch (error) {
                 console.error("Failed to fetch history data:", error);
             } finally {
-                setLoading(false); // Stop loading after data is fetched
+                setLoading(false);
             }
         };
+
         fetchHistory();
     }, []);
 
     useEffect(() => {
-        // Scroll to history section if displayDataType is "history"
+        // 如果 displayDataType 是 "history"，则滚动到历史部分
         if (displayDataType === "history" && historySectionRef.current) {
             document.getElementById("history").scrollIntoView({ behavior: "smooth", block: "start", inline: "start" });
         }
@@ -55,8 +68,8 @@ export const HistoryPage = () => {
         const now = new Date();
         const time = new Date(timestamp);
         const diff = now - time;
-
         const minutes = Math.floor(diff / (1000 * 60));
+        if(minutes === 0) return "刚刚";
         if (minutes < 60) return `${minutes} 分钟前`;
 
         const hours = Math.floor(diff / (1000 * 60 * 60));
@@ -72,30 +85,65 @@ export const HistoryPage = () => {
         return `${years} 年前`;
     };
 
-    // Format the data for the line chart
-    const LineChartComponent = () => {
-        function formatDate(date) {
-            const month = date.getMonth() + 1;  // getMonth() returns 0-11, so add 1
-            const day = date.getDate();         // getDate() returns 1-31
-            return `${month}-${day}`;
-        }
+    // 数据聚合函数：按日期聚合 total_score（取平均值）
+    const aggregateHistoryData = (data) => {
+        const groupedData = {};
 
-        const formattedData = historyData.map((item) => ({
-            date: formatDate(new Date(item.timeStamp)),  // Format the date
-            得分: item.score,
+        data.forEach(item => {
+            const date = formatDate(new Date(item.timeStamp));
+            if (!groupedData[date]) {
+                groupedData[date] = { date, total_score: 0, count: 0 };
+            }
+            groupedData[date].total_score += item.score.total_score;
+            groupedData[date].count += 1;
+        });
+
+        // 计算每个日期的平均分
+        const aggregatedData = Object.values(groupedData).map(item => ({
+            date: item.date,
+            平均得分: parseFloat((item.total_score / item.count).toFixed(2)), // 保留两位小数
         }));
 
+        // 按日期排序
+        aggregatedData.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        return aggregatedData;
+    };
+
+    //统计这些数据中有多少不同的日期
+    const countDifferentDates=(data)=>{
+        const dates=[];
+        data.forEach(item=>{
+            const date = formatDate(new Date(item.timeStamp));
+            if(!dates.includes(date)){
+                dates.push(date)
+            }
+        })
+        return dates.length;
+    }
+
+    // 日期格式化函数（用于聚合）
+    const formatDate = (date) => {
+        const month = date.getMonth() + 1;  // getMonth() 返回 0-11，加 1
+        const day = date.getDate();         // getDate() 返回 1-31
+        return `${month}-${day}`;
+    };
+
+    // 格式化折线图的数据
+    const LineChartComponent = () => {
+        const formattedData = aggregateHistoryData(historyData);
+
         return (
-                <ResponsiveContainer width="100%" height={300} className={"graph"}>
-                    <LineChart data={formattedData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis domain={[0, 100]} />
-                        <Tooltip />
-                        <Legend />
-                        <Line type="monotone" dataKey="得分" stroke="#8884d8" activeDot={{ r: 8 }} />
-                    </LineChart>
-                </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height={300} className={"graph"}>
+                <LineChart data={formattedData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis domain={[0, 100]} />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="平均得分" stroke="#8884d8" activeDot={{ r: 8 }} />
+                </LineChart>
+            </ResponsiveContainer>
         );
     };
 
@@ -105,17 +153,19 @@ export const HistoryPage = () => {
                 <Header className={"header"} />
                 {loading ? (
                     <Content className="content">
-                        <Typography.Text>加载中...</Typography.Text> {/* Loading state */}
+                        <Typography.Text>加载中...</Typography.Text> {/* 加载状态 */}
                     </Content>
                 ) : historyData.length > 0 ? (
                     <Content className="content">
                         {/* Insights Section */}
+                        {countDifferentDates(historyData)>=2?(
                         <div className="insights">
                             <h1 className={"title"}>洞察</h1>
                             <h3 className="graph-name">肤质得分变化</h3>
                             <LineChartComponent />
                         </div>
-                        <h1 ref={historySectionRef} className="title">历史</h1> {/* History section */}
+                            ):<></>}
+                        <h1 ref={historySectionRef} id="history" className="title">历史</h1> {/* 添加 id="history" */}
                         <List
                             className="history"
                             dataSource={historyData}
@@ -132,7 +182,7 @@ export const HistoryPage = () => {
                                         main={
                                             <div className="info">
                                                 <Typography.Text className="score">
-                                                    <span className="value">{item.score}分</span>
+                                                    <span className="value">{item.score.total_score}分</span>
                                                 </Typography.Text>
                                                 <br />
                                                 <Typography.Text className="time">
@@ -159,5 +209,4 @@ export const HistoryPage = () => {
             </Layout>
         </div>
     );
-
 };
