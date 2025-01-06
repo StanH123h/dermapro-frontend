@@ -34,3 +34,41 @@ export const TRANSLATED_SKIN_TONE={
     3:"小麦",
     4:"黝黑/古铜"
 }
+
+export const WATER_SEVERITY_TRANSLATION=(severity)=>{
+    if(severity<=20){
+        return "正常"
+    }
+    else if(severity<=50){
+        return "轻度缺水"
+    }
+    else if(severity<=80){
+        return "中度缺水"
+    }
+    else{
+        return "重度缺水"
+    }
+}
+
+export const ROUGH_SEVERITY_TRANSLATION=(severity)=>{
+    if(severity<=20){
+        return "正常"
+    }
+    else if(severity<=50){
+        return "轻度粗糙"
+    }
+    else if(severity<=80){
+        return "中度粗糙"
+    }
+    else{
+        return "重度粗糙"
+    }
+}
+
+//黑眼圈类型翻译
+export const EYE_DARK_CIRCLE_TYPE_TRANSLATION ={
+    0:"无黑眼圈",
+    1:"色素型黑眼圈",
+    2:"血管型黑眼圈",
+    3:"阴影型黑眼圈"
+}

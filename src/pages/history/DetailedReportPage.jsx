@@ -31,7 +31,7 @@ export const DetailedReportPage = () => {
                 console.log("Response received:", res);
                 const fetchedData = res.data || {};
                 console.log("Fetched Data Result:", fetchedData.result);
-                setData(res.data.data);
+                setData(res.data);
                 setLoading(false);
             })
             .catch((error) => {

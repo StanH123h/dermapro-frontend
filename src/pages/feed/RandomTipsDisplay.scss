@@ -7,7 +7,8 @@
   .tip {
     position: relative;
     box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.2); // 增加阴影模糊度和透明度
-    background-color: rgb(255, 255, 255);
+    //background-color: rgb(255, 255, 255);
+    background-color: var(--sub-color);
     border-radius: 10px;
     transition: box-shadow 0.3s ease-in-out;
 

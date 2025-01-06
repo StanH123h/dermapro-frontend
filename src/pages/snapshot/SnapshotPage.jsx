@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import * as cv from '@techstark/opencv-js';
 import "./SnapshotPage.scss"
 import {Button, Layout} from "@douyinfe/semi-ui";
-import {IconCamera} from "@douyinfe/semi-icons";
+import {IconCamera, IconChevronLeft} from "@douyinfe/semi-icons";
 import axiosInstance from "../../api/axiosInstance";
 import {useNavigate} from "react-router-dom";
 
@@ -221,19 +221,38 @@ const SnapshotPage = () => {
     };
 
     const takePhoto = () => {
-        if (!isReadyToTakePhoto || !canvasRef.current) return;
+        if (!isReadyToTakePhoto || !canvasRef.current || !videoRef.current) return;
 
         const canvas = canvasRef.current;
-        const imageDataUrl = canvas.toDataURL('image/png'); // Capture the current frame as a base64 image
-        setCapturedImage(imageDataUrl); // Store the captured image for preview
-        setIsReadyToTakePhoto(false); // Hide the take photo button after taking a photo
+        const video = videoRef.current;
+        const ctx = canvas.getContext('2d');
+
+        // 设置 Canvas 尺寸与 Video 一致
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        // 翻转 Canvas 坐标系
+        ctx.save(); // 保存当前状态
+        ctx.scale(-1, 1); // 水平翻转
+        ctx.translate(-canvas.width, 0); // 将画布坐标平移回来
+
+        // 绘制翻转后的 Video 图像
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // 恢复 Canvas 状态
+        ctx.restore();
+
+        // 获取翻转后的图像
+        const imageDataUrl = canvas.toDataURL('image/png');
+        setCapturedImage(imageDataUrl); // 存储图像以供预览
+        setIsReadyToTakePhoto(false);
 
         // 关闭摄像头
-        if (videoRef.current && videoRef.current.srcObject) {
-            const stream = videoRef.current.srcObject;
+        if (video.srcObject) {
+            const stream = video.srcObject;
             const tracks = stream.getTracks();
             tracks.forEach((track) => track.stop());
-            videoRef.current.srcObject = null; // 清空 video 的源
+            video.srcObject = null;
         }
     };
 
@@ -292,17 +311,18 @@ const SnapshotPage = () => {
     return (
         <div className={"snapshot-page"}>
             <Layout>
-                <Header className={"header"}></Header>
+                <Header className={"header"}>
+                    <IconChevronLeft onClick={() => navigate("/")} />
+                </Header>
                 <Content className={"content"}>
                     {!capturedImage ? (
                         <div className={"photo-taking"}>
-                            <Button className={"button"} onClick={takePhoto}
-                                    style={{backgroundColor: isReadyToTakePhoto ? "blanchedalmond" : "gray"}}
-                                    disabled={!isReadyToTakePhoto}
-                                    icon={<IconCamera />}
-                            > {isReadyToTakePhoto ? '拍照' : getWarningMessage()}</Button>
                             <div className="video-container" style={{position: 'relative'}}>
                                 <video ref={videoRef} autoPlay width="100%" height="auto"
+                                       style={{
+                                           transform: 'scaleX(-1)', // 水平翻转
+                                           WebkitTransform: 'scaleX(-1)', // 兼容旧版 Webkit 浏览器
+                                       }}
                                        onLoadedData={() => setVideoLoaded(true)}/>
                                 {videoLoaded ? (
                                     <svg
@@ -334,9 +354,12 @@ const SnapshotPage = () => {
                                 ) : <></>}
 
                                 <canvas ref={canvasRef} style={{display: 'none'}}></canvas>
-                                {/*<h1>{getWarningMessage()}</h1>*/}
                             </div>
-
+                            <Button className={"photo-button"} onClick={takePhoto}
+                                    style={{backgroundColor: isReadyToTakePhoto ? "var(--sub-color)" : "gray"}}
+                                    disabled={!isReadyToTakePhoto}
+                                    icon={<IconCamera />}
+                            > {isReadyToTakePhoto ? '拍照' : getWarningMessage()}</Button>
 
                         </div>
                     ) : (

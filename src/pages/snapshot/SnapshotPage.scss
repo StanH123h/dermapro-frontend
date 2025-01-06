@@ -1,13 +1,19 @@
 .snapshot-page {
+  .header{
+    display: flex;
+    justify-content: flex-start;
+  }
   .content {
     .photo-taking {
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
+      width: 100%;
       .video,.canvas {
         width: 92vw;
       }
-      .button{
+      .photo-button{
         width: 50vw;
         height: 20vw;
         border-radius: 5vw;
@@ -17,6 +23,9 @@
     }
     .preview{
       .options{
+        *{
+          background-color: var(--sub-color);
+        }
         margin-top:5vh;
         width:100%;
         display: flex;

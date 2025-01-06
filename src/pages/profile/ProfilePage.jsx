@@ -5,6 +5,7 @@ import axiosInstance from "../../api/axiosInstance";
 import "./ProfilePage.scss";
 import {useNavigate} from "react-router-dom";
 import {motion} from "framer-motion"
+import {IconColorPalette, IconExit} from "@douyinfe/semi-icons";
 
 export const ProfilePage = () => {
     const GENDER={
@@ -14,23 +15,15 @@ export const ProfilePage = () => {
     }
     const [userInfo,setUserInfo] = useState({})
     useEffect(() => {
-        // const res = {
-        //     data:{
-        //
-        //         "name": "knknknk",
-        //         "phoneNumber": "bjbjbjbjbjj",
-        //         "email": "1735443634@qq.com",
-        //         "age": 0,
-        //         "avatar": null,
-        //         "gender": 0
-        //     }
-        // }
+
         axiosInstance.get("user/userInfo").then(
             res=>{
                 setUserInfo(res.data)
+                setAvatar(res.data.avatar)
             }
-        )
-        // setUserInfo(res.data)
+        ).catch((err) => {
+            console.error("获取用户信息失败:", err); // 控制台记录错误
+        });
     }, []);
     const navigate=useNavigate()
     const { Header, Content, Footer } = Layout;
@@ -68,6 +61,39 @@ export const ProfilePage = () => {
         <div className="profile-page">
             <Layout>
                 <Header className="header">
+                    <span/>
+                    <div className="buttons">
+                        <IconColorPalette onClick={()=>{
+                            if(localStorage.getItem("theme")==="default") {
+                                document.documentElement.style.setProperty('--sub-color', "#d0ffd6");
+                                document.documentElement.style.setProperty('--primary-color', "#8cd09f");
+                                Toast.info("主题颜色设置为: 自然")
+                                localStorage.setItem("theme", "natural")
+                            }
+                            else if(localStorage.getItem("theme")==="natural") {
+                                document.documentElement.style.setProperty('--sub-color', "#9FFCDF");
+                                document.documentElement.style.setProperty('--primary-color', "#52AD9C");
+                                Toast.info("主题颜色设置为: 深空")
+                                localStorage.setItem("theme","sky")
+                            }
+                            else {
+                                document.documentElement.style.setProperty('--sub-color', "#FFF");
+                                document.documentElement.style.setProperty('--primary-color', "#d8d3c5");
+                                Toast.info("主题颜色设置为: 默认")
+                                localStorage.setItem("theme","default")
+                            }
+                        }}/>
+                        <IconExit onClick={()=>{
+                            Toast.warning('您已退出登陆,即将跳转至登录页面');
+                            setTimeout(()=>{
+                                // 清除过期的 token
+                                localStorage.removeItem('fuzhitoken');
+                                // 导航到 /login
+                                window.location.href = '/login';
+                            },1000)
+                        }} />
+                    </div>
+
                 </Header>
                 <Content className="content">
                     <div className="user-name-and-avatar-and-email">
@@ -75,7 +101,7 @@ export const ProfilePage = () => {
                                     animate={{ opacity: 1, scale: 1 }}>
                             <Avatar
                                 size="large"
-                                src={`https://www.fuzhi.space/${userInfo.avatar}`}
+                                src={`https://www.fuzhi.space/${avatar}`}
                                 style={{margin: 4, cursor: "pointer"}}
                                 alt="User Avatar"
                                 onClick={handleAvatarClick} // 点击头像触发文件选择
@@ -111,15 +137,15 @@ export const ProfilePage = () => {
                         <h4>手机号:{userInfo.phoneNumber||"未填写"}</h4>
                         <br />
                     </Card>
-                    <Card className="my-footprint">
+                    <Card className="user-book">
                         <h4>用户手册</h4>
                     </Card>
-                    <Card className="my-subscribes">
+                    <Card className="faq">
                         <h4>常见问题</h4>
                     </Card>
                 </Content>
-                <Footer className="footer">
-                    <BottomNavBar currentPage="profile" />
+                <Footer className={"footer"}>
+                    <BottomNavBar currentPage={"profile"} />
                 </Footer>
             </Layout>
         </div>

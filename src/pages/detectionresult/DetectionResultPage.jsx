@@ -2,7 +2,13 @@ import "./DetectionResultPage.scss";
 import { Layout, Table, TabPane, Tabs} from "@douyinfe/semi-ui";
 import {IconChevronLeft} from "@douyinfe/semi-icons";
 import {useEffect, useRef, useState} from "react";
-import {ACNETYPES, TRANSLATED_SKIN_TONE, TRANSLATED_SKIN_TYPE, TRANSLATED_WRINKLE_DATA} from "./constants";
+import {
+    ACNETYPES, EYE_DARK_CIRCLE_SCORE_TRANSLATION, EYE_DARK_CIRCLE_TYPE_TRANSLATION, ROUGH_SEVERITY_TRANSLATION,
+    TRANSLATED_SKIN_TONE,
+    TRANSLATED_SKIN_TYPE,
+    TRANSLATED_WRINKLE_DATA,
+    WATER_SEVERITY_TRANSLATION
+} from "../constants";
 import {useLocation, useNavigate} from "react-router-dom";
 
 export const AcneAnalyze = ({imgUrl, data}) => {
@@ -163,8 +169,8 @@ export const SkinAnalysis = ({ data }) => {
         { title: '值', dataIndex: 'value' },
     ];
     const hydrationData = [
-        { key: '1', name: '水分程度', value: data.water.water_severity },
-        { key: '2', name: '粗糙度', value: data.rough.rough_severity },
+        { key: '1', name: '水分程度', value: WATER_SEVERITY_TRANSLATION(data.water.water_severity) },
+        { key: '2', name: '粗糙度', value: ROUGH_SEVERITY_TRANSLATION(data.rough.rough_severity) },
     ];
 
     const poresColumns = [
@@ -191,10 +197,23 @@ export const SkinAnalysis = ({ data }) => {
         { title: '值', dataIndex: 'value' },
     ];
     const darkCircleData = [
-        { key: '1', name: '黑眼圈程度', value: data.dark_circle.value },
-        { key: '2', name: '左眼黑眼圈得分', value: data.score_info.dark_circle_type_score.left_dark_circle_score },
-        { key: '3', name: '右眼黑眼圈得分', value: data.score_info.dark_circle_type_score.right_dark_circle_score },
+        { key: '1', name: '黑眼圈类型', value: EYE_DARK_CIRCLE_TYPE_TRANSLATION[data.dark_circle.value] },
+        { key: '2', name: '左眼黑眼圈严重程度得分(满分100)', value: data.score_info.dark_circle_type_score.left_dark_circle_score },
+        { key: '3', name: '右眼黑眼圈严重程度得分(满分100)', value: data.score_info.dark_circle_type_score.right_dark_circle_score },
     ];
+
+// 检查黑眼圈类型值
+    if (data.dark_circle.value !== 0 && data.dark_circle_severity.value) {
+        const severityValue = data.dark_circle_severity.value; // 严重程度
+        // 添加严重程度信息
+        darkCircleData.push({
+            key: '4', // 动态分配键值
+            name: '整体黑眼圈严重程度',
+            value: `${severityValue === 0 ? '轻度黑眼圈' : severityValue === 1 ? '中度黑眼圈' : '重度黑眼圈'}`,
+        });
+    }
+
+    console.log(darkCircleData);
 
     const otherSkinColumns = [
         { title: '项目', dataIndex: 'name' },

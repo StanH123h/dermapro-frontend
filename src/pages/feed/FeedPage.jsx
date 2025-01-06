@@ -1,37 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { Layout } from "@douyinfe/semi-ui";
+import {Layout, Toast} from "@douyinfe/semi-ui";
 import { motion } from "framer-motion";
 import { IconSearch } from '@douyinfe/semi-icons';
 import "./FeedPage.scss";
 import { BottomNavBar } from "../../components/BottomNavBar/BottomNavBar";
 import RandomTipsDisplay from "./RandomTipsDisplay";
 import { tipsData } from "./tipsData";
-import {PhotoSnapButton} from "../../components/PhotoSnapButton/PhotoSnapButton"; // Import the tips data from a centralized file
 
 export const FeedPage = () => {
     const { Header, Footer, Content } = Layout;
-
     // State to manage the search query and filtered tips
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredTips, setFilteredTips] = useState([]);
     const [isOnFocus,setIsOnFocus] = useState(false)
-
     // Shuffle function to randomize the tips an return 5 of them
     const shuffleArray = (array) => {
         const shuffled = [...array];
         const selectedItems = [];
-
         // 随机选择 `count` 个元素
         while (selectedItems.length < 5 && shuffled.length > 0) {
             const randomIndex = Math.floor(Math.random() * shuffled.length); // 随机索引
             selectedItems.push(shuffled.splice(randomIndex, 1)[0]); // 抽取并删除已选择元素
         }
-
         return selectedItems;
     };
-
     // Effect to filter or shuffle tips based on search query
     useEffect(() => {
+        if(!localStorage.getItem("fuzhitoken")){
+            Toast.warning('您未登陆,即将跳转至登录页面');
+            setTimeout(()=>{
+                // 清除过期的 token
+                localStorage.removeItem('fuzhitoken');
+                // 导航到 /login
+                window.location.href = '/login';
+            },300)
+        }
         if (searchQuery.trim()) {
             const filtered = tipsData.filter(tip =>
                 tip.title.toLowerCase().includes(searchQuery.toLowerCase()) // Match title with search query
@@ -82,12 +85,16 @@ export const FeedPage = () => {
 
                 {/* Content Area: Display Random or Filtered Tips */}
                 <Content className="content">
-                    <RandomTipsDisplay tips={filteredTips} /> {/* Pass the filtered or shuffled tips */}
+                    <RandomTipsDisplay tips={filteredTips}/> {/* Pass the filtered or shuffled tips */}
+                    <div className="archive">
+                        津ICP备2024027018号-1
+                        <a href={"http://beian.miit.gov.cn/"} target="_blank">备案查询</a>
+                    </div>
                 </Content>
 
                 {/* Footer with Bottom Navigation Bar */}
                 <Footer className="footer">
-                    <BottomNavBar currentPage={"home"} />
+                    <BottomNavBar currentPage={"home"}/>
                 </Footer>
             </Layout>
         </div>

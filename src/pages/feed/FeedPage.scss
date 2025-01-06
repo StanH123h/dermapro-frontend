@@ -9,11 +9,11 @@
     align-items: center;
     border-radius: 6vw;
     background-color: rgba(0, 0, 0, 0.2);
-    height: 3vh;
-    padding-left: 10vw;
+    height: 25px;
+    padding-left: 40px;
     box-sizing: border-box;
     .icon{
-      left: 1vw;
+      left: 10px;
       position: absolute;
     }
     .search-bar {
@@ -27,5 +27,14 @@
       outline: none;
     }
   }
-
+  .archive{
+    height: 10px;
+    text-align: center;
+    color: gray;
+    font-size: 10px;
+    line-height: 100%;
+    a{
+      color: gray;
+    }
+  }
 }

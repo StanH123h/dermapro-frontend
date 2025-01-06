@@ -38,10 +38,10 @@ export const HistoryPage = () => {
                     },
                 });
 
-                if (Array.isArray(response.data.data)) {
-                    setHistoryData(response.data.data);
+                if (Array.isArray(response.data)) {
+                    setHistoryData(response.data);
                     // 存储数据到缓存中
-                    localStorage.setItem("historyData", JSON.stringify(response.data.data));
+                    localStorage.setItem("historyData", JSON.stringify(response.data));
                     localStorage.setItem("historyCacheTimestamp", now.toString());
                 } else {
                     console.error("Returned data is not an array");
@@ -178,7 +178,7 @@ export const HistoryPage = () => {
                                     <List.Item
                                         onClick={() => navigate(`/detailed-report-page?id=${item.id}`)}
                                         className="item"
-                                        header={<Avatar className="avatar" shape="square" />}
+                                        header={<Avatar className="avatar" shape="square" src={`https://www.fuzhi.space/${item.imageKey}`} spinning />}
                                         main={
                                             <div className="info">
                                                 <Typography.Text className="score">

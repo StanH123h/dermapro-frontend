@@ -19,8 +19,8 @@ export const LoginPage = () => {
                     pwd: values.password,
                 },
             });
-            if (response.status === 200) {
-                localStorage.setItem("fuzhitoken",response.data.data.tokenValue)
+            if (response.code === 200) {
+                localStorage.setItem("fuzhitoken",response.data.tokenValue)
                 Toast.success('登录成功！');
                     navigate('/');
             }
@@ -68,7 +68,6 @@ export const LoginPage = () => {
                         <Form
                             layout="vertical"
                             onSubmit={(values) => handleLogin(values)}
-                            onValueChange={(values) => console.log(values)}
                         >
                             <Form.Input
                                 field="email"

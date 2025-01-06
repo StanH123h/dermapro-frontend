@@ -36,41 +36,44 @@ export const BottomNavBar = ({ currentPage }) => {
     return (
         <div className="bottom-nav-bar">
             {/* Bottom navigation items */}
-            <motion.div
-                className="nav-item"
-                onClick={() => handleNavClick("HistoryData")}
-                style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
-                initial="initial"
-                whileHover="hover"
-                animate={currentPage === "history" ? "selected" : "initial"}  // Apply scale effect if selected
-                variants={scaleVariants}  // Link the scale variants
-            >
-                {currentPage === "history" ? <IconFolder /> : <IconFolderStroked />}
-            </motion.div>
+            <div className="items">
+                <motion.div
+                    className="nav-item"
+                    onClick={() => handleNavClick("HistoryData")}
+                    style={{cursor: "pointer", display: "flex", alignItems: "center"}}
+                    initial="initial"
+                    whileHover="hover"
+                    animate={currentPage === "history" ? "selected" : "initial"}  // Apply scale effect if selected
+                    variants={scaleVariants}  // Link the scale variants
+                >
+                    {currentPage === "history" ? <IconFolder className={"icon"}/> : <IconFolderStroked className={"icon"}/>}
+                </motion.div>
 
-            <motion.div
-                className="nav-item"
-                onClick={() => handleNavClick("Home")}
-                style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
-                initial="initial"
-                whileHover="hover"
-                animate={currentPage === "home" ? "selected" : "initial"}
-                variants={scaleVariants}
-            >
-                {currentPage === "home" ? <IconHome /> : <IconHomeStroked />}
-            </motion.div>
+                <motion.div
+                    className="nav-item"
+                    onClick={() => handleNavClick("Home")}
+                    style={{cursor: "pointer", display: "flex", alignItems: "center"}}
+                    initial="initial"
+                    whileHover="hover"
+                    animate={currentPage === "home" ? "selected" : "initial"}
+                    variants={scaleVariants}
+                >
+                    {currentPage === "home" ? <IconHome className={"icon"}/> : <IconHomeStroked className={"icon"}/>}
+                </motion.div>
 
-            <motion.div
-                className="nav-item"
-                onClick={() => handleNavClick("Profile")}
-                style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
-                initial="initial"
-                whileHover="hover"
-                animate={currentPage === "profile" ? "selected" : "initial"}
-                variants={scaleVariants}
-            >
-                {currentPage === "profile" ? <IconUser /> : <IconUserStroked />}
-            </motion.div>
+                <motion.div
+                    className="nav-item"
+                    onClick={() => handleNavClick("Profile")}
+                    style={{cursor: "pointer", display: "flex", alignItems: "center"}}
+                    initial="initial"
+                    whileHover="hover"
+                    animate={currentPage === "profile" ? "selected" : "initial"}
+                    variants={scaleVariants}
+                >
+                    {currentPage === "profile" ? <IconUser className={"icon"}/> : <IconUserStroked className={"icon"}/>}
+                </motion.div>
+            </div>
+
         </div>
     );
 };
