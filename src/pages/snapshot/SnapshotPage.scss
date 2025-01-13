@@ -8,14 +8,26 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      width: 100%;
-      .video,.canvas {
-        width: 92vw;
+      justify-content: space-between;
+      height: 100%;
+      .video-container {
+        width: 100%; // 确保占满父级宽度
+        height: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
       }
+        video {
+          width: 100%; // 保证视频宽度占满容器
+          height: auto; // 根据宽高比自动调整高度
+          min-height: 70vh; // 保证不会超出视口
+          object-fit: cover; // 确保内容适配容器大小
+        }
       .photo-button{
+        font-size: 10px;
+        min-height: 60px;
         width: 50vw;
-        height: 20vw;
         border-radius: 5vw;
         white-space: wrap;
         margin-bottom: 5vh;
@@ -31,6 +43,12 @@
         display: flex;
         justify-content: space-evenly;
         align-items: center;
+      }
+      img {
+        width: 100%; // 保证宽度占满容器
+        height: auto; // 保持宽高比
+        object-fit: cover; // 确保内容填充容器
+        min-height: 70vh; // 设置最小高度
       }
     }
   }

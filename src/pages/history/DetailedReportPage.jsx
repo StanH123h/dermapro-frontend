@@ -16,6 +16,15 @@ export const DetailedReportPage = () => {
     const [loading, setLoading] = useState(true);
     const { Header, Content, Footer } = Layout;
 
+    const formatTimestamp = (timestamp) => {
+        const date = new Date(timestamp);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1; // 月份从 0 开始，需要 +1
+        const day = date.getDate();
+
+        return `${year}/${month}/${day}`;
+    };
+
     useEffect(() => {
         if (!id) {
             console.error("No id provided in query parameters");
@@ -26,7 +35,7 @@ export const DetailedReportPage = () => {
 
         console.log("Fetching data for ID:", id);
         axiosInstance
-            .get("/analysis/getSkinAnalysisReport", { params: { "Id":id } })
+            .get("/analysis/getSkinAnalysisReport", { params: { "id":id } })
             .then((res) => {
                 console.log("Response received:", res);
                 const fetchedData = res.data || {};
@@ -53,7 +62,7 @@ export const DetailedReportPage = () => {
                     ) : (
                         <>
                             <div className="report-info">
-                                <h3 className="title">皮肤报告:2024/09/27</h3>
+                                <h3 className="title">皮肤报告:{formatTimestamp(data.timeStamp)}</h3>
                                 <span className="result-id" style={{ color: "rgb(150,152,152)" }}>
                                     ID: {id}
                                 </span>

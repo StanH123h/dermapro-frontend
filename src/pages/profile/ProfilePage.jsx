@@ -29,6 +29,7 @@ export const ProfilePage = () => {
     const { Header, Content, Footer } = Layout;
     const [avatar, setAvatar] = useState(null); // 用于存储用户头像的 URL 或文件
     const fileInputRef = useRef(null); // 引用文件输入框
+    const [isNewAvatar,setIsNewAvatar] = useState(false)
 
     const handleAvatarClick = () => {
         fileInputRef.current.click(); // 模拟点击文件上传控件
@@ -42,13 +43,14 @@ export const ProfilePage = () => {
         formData.append("file", file);
 
         try {
-
+            Toast.info("正在更换头像，请稍等")
             const response = await axiosInstance.post("/user/uploadAvatar", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
             });
-            if (response.status === 200) {
+            if (response.code === 200) {
+                setIsNewAvatar(true)
                 Toast.success("头像上传成功！");
                 setAvatar(URL.createObjectURL(file)); // 更新头像显示
             }
@@ -73,8 +75,8 @@ export const ProfilePage = () => {
                             else if(localStorage.getItem("theme")==="natural") {
                                 document.documentElement.style.setProperty('--sub-color', "#9FFCDF");
                                 document.documentElement.style.setProperty('--primary-color', "#52AD9C");
-                                Toast.info("主题颜色设置为: 深空")
-                                localStorage.setItem("theme","sky")
+                                Toast.info("主题颜色设置为: 薄荷")
+                                localStorage.setItem("theme","mint")
                             }
                             else {
                                 document.documentElement.style.setProperty('--sub-color', "#FFF");
@@ -101,7 +103,7 @@ export const ProfilePage = () => {
                                     animate={{ opacity: 1, scale: 1 }}>
                             <Avatar
                                 size="large"
-                                src={`https://www.fuzhi.space/${avatar}`}
+                                src={isNewAvatar?avatar:`https://www.fuzhi.space/${avatar}`}
                                 style={{margin: 4, cursor: "pointer"}}
                                 alt="User Avatar"
                                 onClick={handleAvatarClick} // 点击头像触发文件选择

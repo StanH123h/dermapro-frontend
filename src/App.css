@@ -1,74 +1,92 @@
 .App {
-  text-align: center;
+    text-align: center;
 }
 
 .App-logo {
-  height: 40vmin;
-  pointer-events: none;
+    height: 40vmin;
+    pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+    .App-logo {
+        animation: App-logo-spin infinite 20s linear;
+    }
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
 }
 
 .App-link {
-  color: #61dafb;
+    color: #61dafb;
 }
 
 @keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
-*{
-  padding: 0;
-  margin: 0;
-  font-family: DouyinSansBold, sans-serif;
+
+* {
+    padding: 0;
+    margin: 0;
+    font-family: DouyinSansBold, sans-serif;
 }
 
 :root {
-  --primary-color: #d8d3c5;
-  --sub-color: #FFF;
+    --primary-color: #d8d3c5;
+    --sub-color: #FFF;
 }
 
-[class$="page"] {
-  background-color: var(--primary-color) !important;
-  .header{
-    max-width: 100vw;
-    box-sizing: border-box;
-    padding: 0 4vw;
-    height: 6vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .content{
-    max-width: 100vw;
-    box-sizing: border-box;
-    padding: 0 4vw;
-    height: 88vh;
-    overflow: scroll;
-  }
-  .footer{
-    overflow: hidden;
-    max-width: 100vw;
-    box-sizing: border-box;
-    height: 6vh;
-  }
+[class*="-page"] {
+    background-color: var(--primary-color);
+    .header {
+        position: fixed; /* 固定在页面顶部 */
+        top: 0; /* 距离顶部为 0 */
+        left: 0; /* 距离左侧为 0 */
+        width: 100%; /* 占满宽度 */
+        height: 6vh; /* 保持你定义的高度 */
+        background-color: var(--primary-color);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000; /* 确保在内容上层 */
+        padding: 0 4vw;
+    }
+
+    .content {
+        max-width: 100vw;
+        box-sizing: border-box;
+        padding: 6vh 4vw 6vh 4vw;
+        height: 100svh;
+        overflow: scroll;
+    }
+
+    .footer {
+        position: fixed;
+        bottom: env(safe-area-inset-bottom); /* 考虑 iOS 的安全区域 */
+        left: 0;
+        width: 100%;
+        z-index: 999;
+        height: 6vh;
+        background-color: var(--primary-color); /* 避免透明 */
+    }
+
+    /*
+    IOS系统在font-size<16px时用户点击input元素后会放大页面聚焦在这个输入框中，这里设置16px是为了防止页面被放大从而导致样式出错
+     */
+
+    input, textarea {
+        font-size: 16px !important;
+    }
 }

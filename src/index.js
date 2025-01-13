@@ -9,7 +9,7 @@ if(localStorage.getItem("theme")==="natural"){
     document.documentElement.style.setProperty('--sub-color', "#d0ffd6");
     document.documentElement.style.setProperty('--primary-color', "#8cd09f");
 }
-else if(localStorage.getItem("theme")==="sky"){
+else if(localStorage.getItem("theme")==="mint"){
     document.documentElement.style.setProperty('--sub-color', "#9FFCDF");
     document.documentElement.style.setProperty('--primary-color', "#52AD9C");
 }

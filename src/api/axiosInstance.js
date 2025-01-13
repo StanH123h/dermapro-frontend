@@ -32,10 +32,12 @@ axiosInstance.interceptors.response.use(
         return response.data;
     },
     (error) => {
-        if(error.response.data.code===1005){
+        if(error.response.data.code===1006){
+            Toast.error('登录失败，请检查邮箱和密码！');
             return;
         }
         if (error.response) {
+            console.log(error.response)
             // 获取错误状态码
             const status = error.response.status;
 

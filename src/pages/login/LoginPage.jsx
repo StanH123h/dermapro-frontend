@@ -25,7 +25,6 @@ export const LoginPage = () => {
                     navigate('/');
             }
         } catch (err) {
-            Toast.error('登录失败，请检查邮箱和密码！');
         } finally {
             setLoading(false);
         }

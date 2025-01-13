@@ -1,37 +1,33 @@
-import React, {useEffect, useRef, useState} from 'react';
-import * as cv from '@techstark/opencv-js';
+import React, { useEffect, useRef, useState } from 'react';
+import * as faceapi from 'face-api.js'; // Added face-api.js import
 import "./SnapshotPage.scss"
-import {Button, Layout} from "@douyinfe/semi-ui";
-import {IconCamera, IconChevronLeft} from "@douyinfe/semi-icons";
+import {Button, Layout, Spin, Toast} from "@douyinfe/semi-ui";
+import { IconCamera, IconChevronLeft } from "@douyinfe/semi-icons";
 import axiosInstance from "../../api/axiosInstance";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const SnapshotPage = () => {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
-    const faceCascadeRef = useRef(null); // Cache the CascadeClassifier for performance
+    const [isLoading, setIsLoading] = useState(false);
+    // Removed faceCascadeRef
     const [isReadyToTakePhoto, setIsReadyToTakePhoto] = useState(false);
     const [warning, setWarning] = useState('正在初始化摄像头和检测器，请稍候...');
     const [capturedImage, setCapturedImage] = useState(null); // Store captured image data
-    const {Header, Content, Footer} = Layout
-    const navigate=useNavigate()
+    const { Header, Content, Footer } = Layout
+    const navigate = useNavigate()
     const [isButtonDisabled, setIsButtonDisabled] = useState(false)
-    const [videoLoaded,setVideoLoaded]=useState(false);
+    const [videoLoaded, setVideoLoaded] = useState(false);
 
     useEffect(() => {
         const initialize = async () => {
             try {
-                if (!cv.getBuildInformation) {
-                    setWarning('正在加载 OpenCV...');
-                    await new Promise((resolve) => {
-                        cv['onRuntimeInitialized'] = resolve;
-                    });
-                }
-                setWarning('正在加载人脸检测模型...');
-                await loadCascadeFile(); // Ensure the Haar Cascade file is loaded
-
-                setWarning('正在初始化人脸检测器...');
-                initializeFaceCascade(); // Initialize the CascadeClassifier
+                setWarning('正在加载 face-api.js 模型...');
+                // Load face-api.js models
+                await Promise.all([
+                    faceapi.nets.tinyFaceDetector.loadFromUri('/models'), // Ensure models are in public/models
+                    // You can load additional models if needed
+                ]);
 
                 setWarning('正在启动摄像头...');
                 await startCamera(); // Start accessing the camera
@@ -86,134 +82,52 @@ const SnapshotPage = () => {
         }
     };
 
-
-    const loadCascadeFile = async () => {
-        const faceCascadeUrl = `${process.env.PUBLIC_URL}/haarcascade_frontalface_default.xml`;
-        try {
-            const response = await fetch(faceCascadeUrl);
-            if (!response.ok) {
-                throw new Error(`无法加载人脸检测模型: ${response.status} ${response.statusText}`);
-            }
-            const buffer = await response.arrayBuffer();
-            const data = new Uint8Array(buffer);
-            cv.FS_createDataFile('/', 'haarcascade_frontalface_default.xml', data, true, false, false);
-        } catch (error) {
-            throw new Error('人脸检测模型加载失败，请检查网络连接');
-        }
-    };
-
-    const initializeFaceCascade = () => {
-        try {
-            if (!cv.CascadeClassifier) {
-                throw new Error('CascadeClassifier 未在 OpenCV.js 中找到');
-            }
-            faceCascadeRef.current = new cv.CascadeClassifier('haarcascade_frontalface_default.xml');
-        } catch (error) {
-            console.error('人脸检测器初始化失败:', error.message);
-            throw new Error('人脸检测器初始化失败，请刷新页面');
-        }
-    };
-
-    const processFrame = () => {
-        if (!videoRef.current || !canvasRef.current || !faceCascadeRef.current) {
+    const processFrame = async () => {
+        if (!videoRef.current || !canvasRef.current) {
             setWarning('资源未完全加载，正在重试...');
             return;
         }
 
-        const canvas = canvasRef.current;
         const video = videoRef.current;
-        const ctx = canvas.getContext('2d');
 
         if (video.videoWidth === 0 || video.videoHeight === 0) {
             setWarning('视频画面不可用，请检查摄像头是否正常');
             return;
         }
 
+        const canvas = canvasRef.current;
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
 
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-        let src = cv.matFromImageData(imageData);
+        const displaySize = { width: video.videoWidth, height: video.videoHeight };
+        faceapi.matchDimensions(canvas, displaySize);
 
         try {
-            let isValid = true; // Track if the image meets all conditions
+            const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
 
-            // Brightness check
-            const brightnessThreshold = {min: 70, max: 180};
-            const mean = cv.mean(src);
-            const brightness = (mean[0] + mean[1] + mean[2]) / 3;
-
-            if (brightness < brightnessThreshold.min) {
-                setWarning('图像过暗，请确保有充足的光线');
-                isValid = false;
-            } else if (brightness > brightnessThreshold.max) {
-                setWarning('图像过亮，请避免过曝');
-                isValid = false;
-            } else {
-                setWarning('');
-            }
-
-            // Convert to grayscale
-            let gray = new cv.Mat();
-            cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
-
-            // Blur detection
-            const blurThreshold =0;
-            let laplacian = new cv.Mat();
-            cv.Laplacian(gray, laplacian, cv.CV_64F);
-
-            let meanMat = new cv.Mat();
-            let stddev = new cv.Mat();
-            cv.meanStdDev(laplacian, meanMat, stddev);
-            const variance = stddev.data64F[0] ** 2;
-
-            if (variance < blurThreshold) {
-                setWarning('图像模糊，请对焦');
-                isValid = false;
-            }
-
-            // Face detection
-            const faces = new cv.RectVector();
-            faceCascadeRef.current.detectMultiScale(
-                gray,
-                faces,
-                1.1,
-                5,
-                cv.CASCADE_FIND_BIGGEST_OBJECT
-            );
-
-            if (faces.size() === 0) {
+            if (detections.length === 0) {
                 setWarning('未检测到人脸，请确保您的脸完全出现在画面中');
-                isValid = false;
-            } else {
-                const face = faces.get(0);
-                const minFaceWidth = canvas.width * 0.4;
-                const minFaceHeight = canvas.height * 0.5;
-
-                if (face.width < minFaceWidth || face.height < minFaceHeight) {
-                    setWarning('人脸过小或未完全显示，请调整位置');
-                    isValid = false;
-                } else if (isValid) {
-                    setWarning('');
-                }
+                setIsReadyToTakePhoto(false);
+                return;
             }
 
-            faces.delete();
-            cleanup(src, gray, laplacian, meanMat, stddev);
+            // Check the size of the first detected face
+            const face = detections[0].box;
+            const minFaceWidth = video.videoWidth * 0.3;
+            const minFaceHeight = video.videoHeight * 0.44;
 
-            setIsReadyToTakePhoto(isValid);
+            if (face.width < minFaceWidth || face.height < minFaceHeight) {
+                setWarning('人脸过小或未完全显示，请调整位置');
+                setIsReadyToTakePhoto(false);
+            } else {
+                setWarning('可以拍照了✅');
+                setIsReadyToTakePhoto(true);
+            }
         } catch (error) {
             console.error('处理帧时出错:', error.message);
             setWarning('处理画面时出错，请稍后重试');
-            cleanup(src);
             setIsReadyToTakePhoto(false);
         }
-    };
-
-    const cleanup = (...mats) => {
-        mats.forEach((mat) => mat && mat.delete());
     };
 
     const getWarningMessage = () => {
@@ -245,7 +159,6 @@ const SnapshotPage = () => {
         // 获取翻转后的图像
         const imageDataUrl = canvas.toDataURL('image/png');
         setCapturedImage(imageDataUrl); // 存储图像以供预览
-        setIsReadyToTakePhoto(false);
 
         // 关闭摄像头
         if (video.srcObject) {
@@ -276,6 +189,7 @@ const SnapshotPage = () => {
 
         // 创建 FormData 实例
         const formData = new FormData();
+        setIsLoading(true)
 
         try {
             // 将 Base64 转换为 Blob
@@ -304,75 +218,103 @@ const SnapshotPage = () => {
             });
         } catch (error) {
             console.error('Error sending image:', error);
+            setIsButtonDisabled(false)
+        } finally {
+            setIsLoading(false)
         }
     };
-
 
     return (
         <div className={"snapshot-page"}>
             <Layout>
                 <Header className={"header"}>
-                    <IconChevronLeft onClick={() => navigate("/")} />
+                    <IconChevronLeft onClick={() => {
+                        if(!isButtonDisabled){
+                        navigate("/")
+                        }
+                        else {
+                            Toast.warning("正在分析面部情况，请勿返回")
+                        }
+                    }} />
                 </Header>
                 <Content className={"content"}>
                     {!capturedImage ? (
                         <div className={"photo-taking"}>
-                            <div className="video-container" style={{position: 'relative'}}>
-                                <video ref={videoRef} autoPlay width="100%" height="auto"
-                                       style={{
-                                           transform: 'scaleX(-1)', // 水平翻转
-                                           WebkitTransform: 'scaleX(-1)', // 兼容旧版 Webkit 浏览器
-                                       }}
-                                       onLoadedData={() => setVideoLoaded(true)}/>
-                                {videoLoaded ? (
+                            <div className="video-container" style={{ position: 'relative' }}>
+                                <video
+                                    playsInline={true}
+                                    ref={videoRef}
+                                    autoPlay
+                                    style={{
+                                        width: "100%", // 覆盖样式为全宽
+                                        minHeight: "70vh", // 限制最大高度
+                                        objectFit: "cover", // 保证内容填充容器
+                                        transform: "scaleX(-1)", // 保持水平翻转
+                                    }}
+                                    onLoadedData={() => setVideoLoaded(true)}
+                                />
+                                {videoLoaded && videoRef.current ? (
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 100 100"
                                         style={{
                                             position: 'absolute',
                                             top: '50%',
                                             left: '50%',
                                             transform: 'translate(-50%, -50%)',
                                             pointerEvents: 'none',
-                                            width: '100%',  // 调整 SVG 的宽度以增大椭圆
-                                            height: '100%', // 调整 SVG 的高度以增大椭圆
+                                            width: `${videoRef.current.clientWidth}px`, // 根据 video 宽动态设置 SVG 宽
+                                            height: `${videoRef.current.clientHeight}px`, // 根据 video 高动态设置 SVG 高
                                             zIndex: 2,
                                         }}
+                                        viewBox="0 0 100 100"
                                     >
                                         <ellipse
                                             cx="50"
                                             cy="50"
-                                            rx="40.5"  // 增加宽度半径
-                                            ry="57"  // 增加高度半径，保持 2:1 比例
+                                            rx="40.5" // 根据比例调整
+                                            ry="57" // 根据比例调整
                                             fill="none"
                                             stroke="white"
                                             strokeWidth="2"
-                                            strokeDasharray="5,5" // 使线条为虚线
+                                            strokeDasharray="5,5" // 虚线样式
                                         />
                                     </svg>
+                                ) : null}
 
-                                ) : <></>}
-
-                                <canvas ref={canvasRef} style={{display: 'none'}}></canvas>
+                                <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
                             </div>
-                            <Button className={"photo-button"} onClick={takePhoto}
-                                    style={{backgroundColor: isReadyToTakePhoto ? "var(--sub-color)" : "gray"}}
-                                    disabled={!isReadyToTakePhoto}
-                                    icon={<IconCamera />}
-                            > {isReadyToTakePhoto ? '拍照' : getWarningMessage()}</Button>
+                            <Button
+                                className={"photo-button"}
+                                onClick={takePhoto}
+                                style={{ backgroundColor: isReadyToTakePhoto ? "var(--sub-color)" : "gray" }}
+                                disabled={!isReadyToTakePhoto}
+                                icon={<IconCamera />}
+                            >
+                                {isReadyToTakePhoto ? '拍照' : getWarningMessage()}
+                            </Button>
 
                         </div>
                     ) : (
                         <div className={"preview"}>
                             <h2>预览图片</h2>
-                            <img src={capturedImage} alt="Captured preview" style={{width: '100%'}}/>
+                            <img src={capturedImage} alt="Captured preview" style={{ width: '100%' }} />
                             <div className="options">
                                 <Button onClick={() => resetCamera()} disabled={isButtonDisabled}>重新拍照</Button>
                                 <Button onClick={() => {
                                     localStorage.setItem("historyCacheTimestamp", "1000000000000")
                                     sendFormData()
                                     setIsButtonDisabled(true)
-                                }} disabled={isButtonDisabled}>就用这张!</Button>
+                                }} disabled={isButtonDisabled}>
+                                    {isLoading && (
+                                        <Spin
+                                            size="small"
+                                            style={{
+                                                marginRight: '8px', // 让 Spin 与文字之间有间距
+                                            }}
+                                        />
+                                    )}
+                                    就用这张!
+                                </Button>
                             </div>
                         </div>
                     )}
@@ -380,7 +322,6 @@ const SnapshotPage = () => {
                 <Footer className={"footer"}></Footer>
             </Layout>
         </div>
-
     );
 };
 

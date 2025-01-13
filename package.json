@@ -5,13 +5,12 @@
   "dependencies": {
     "@douyinfe/semi-icons": "^2.69.2",
     "@douyinfe/semi-ui": "^2.69.2",
-    "@techstark/opencv-js": "^4.10.0-release.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.7",
+    "face-api.js": "^0.22.2",
     "framer-motion": "^11.13.5",
-    "opencv.js": "^1.2.1",
     "path-browserify": "^1.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -19,9 +18,11 @@
     "react-scripts": "5.0.1",
     "recharts": "^2.14.1",
     "sass": "^1.81.0",
+    "source-map-explorer": "^2.5.3",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "analyze": "source-map-explorer 'build/static/js/*.js'",
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test"
