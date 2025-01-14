@@ -20,7 +20,7 @@ const RegisterPage = () => {
                 name: values.name,
                 age: values.age,
             });
-            if (response.status === 201) {
+            if (response.code === 200) {
                 Toast.success('注册成功！跳转至登录页面');
                 navigate('/login');
             }

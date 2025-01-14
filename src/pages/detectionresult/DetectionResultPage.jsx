@@ -3,13 +3,14 @@ import { Layout, Table, TabPane, Tabs} from "@douyinfe/semi-ui";
 import {IconChevronLeft} from "@douyinfe/semi-icons";
 import {useEffect, useRef, useState} from "react";
 import {
-    ACNETYPES, EYE_DARK_CIRCLE_SCORE_TRANSLATION, EYE_DARK_CIRCLE_TYPE_TRANSLATION, ROUGH_SEVERITY_TRANSLATION,
+    ACNETYPES, EYE_DARK_CIRCLE_TYPE_TRANSLATION, ROUGH_SEVERITY_TRANSLATION,
     TRANSLATED_SKIN_TONE,
     TRANSLATED_SKIN_TYPE,
     TRANSLATED_WRINKLE_DATA,
     WATER_SEVERITY_TRANSLATION
 } from "../constants";
 import {useLocation, useNavigate} from "react-router-dom";
+import {formatTimestamp} from "../history/DetailedReportPage";
 
 export const AcneAnalyze = ({imgUrl, data}) => {
     const imageRef = useRef(null); // 用于访问 img
@@ -251,9 +252,9 @@ export const DetectionResultPage = () => {
                 </Header>
                 <Content className="content">
                     <div className="report-info">
-                        <h3 className={"title"}>皮肤报告:2024/09/27</h3>
+                        <h3 className={"title"}>皮肤报告:{formatTimestamp(responseData.timeStamp)}</h3>
                         <span className={"result-id"} style={{color: "rgb(150,152,152)"}}>
-                            ID:912839081283
+                            ID:{responseData.id}
                         </span>
                     </div>
                     <AcneAnalyze imgUrl={capturedImage} data={responseData}/>

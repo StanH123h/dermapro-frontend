@@ -7,6 +7,15 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axiosInstance";
 
+export const formatTimestamp = (timestamp) => {
+    const date = new Date(timestamp);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1; // 月份从 0 开始，需要 +1
+    const day = date.getDate();
+
+    return `${year}/${month}/${day}`;
+};
+
 export const DetailedReportPage = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
@@ -15,15 +24,6 @@ export const DetailedReportPage = () => {
     const [data, setData] = useState({ result: {} });
     const [loading, setLoading] = useState(true);
     const { Header, Content, Footer } = Layout;
-
-    const formatTimestamp = (timestamp) => {
-        const date = new Date(timestamp);
-        const year = date.getFullYear();
-        const month = date.getMonth() + 1; // 月份从 0 开始，需要 +1
-        const day = date.getDate();
-
-        return `${year}/${month}/${day}`;
-    };
 
     useEffect(() => {
         if (!id) {
