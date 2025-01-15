@@ -7,6 +7,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axiosInstance";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import "./HistoryPage.scss";
+import {ScoreDisplay} from "../../components/ScoreDisplay";
 
 export const HistoryPage = () => {
     const location = useLocation();
@@ -20,17 +21,6 @@ export const HistoryPage = () => {
 
     useEffect(() => {
         const fetchHistory = async () => {
-            const cachedData = localStorage.getItem("historyData");
-            const cacheTimestamp = localStorage.getItem("historyCacheTimestamp");
-            const now = Date.now();
-
-            // 检查缓存是否存在且不过期（例如：缓存时间小于30分钟）
-            if (cachedData && cacheTimestamp && now - cacheTimestamp < 30 * 60 * 1000) {
-                setHistoryData(JSON.parse(cachedData));
-                setLoading(false);
-                return;
-            }
-
             try {
                 const response = await axiosInstance.get("/analysis/getSkinAnalysisHistory", {
                     headers: {
@@ -40,9 +30,6 @@ export const HistoryPage = () => {
 
                 if (Array.isArray(response.data)) {
                     setHistoryData(response.data);
-                    // 存储数据到缓存中
-                    localStorage.setItem("historyData", JSON.stringify(response.data));
-                    localStorage.setItem("historyCacheTimestamp", now.toString());
                 } else {
                     console.error("Returned data is not an array");
                     setHistoryData([]);
@@ -166,6 +153,7 @@ export const HistoryPage = () => {
                         </div>
                             ):<></>}
                         <h1 ref={historySectionRef} id="history" className="title">历史</h1> {/* 添加 id="history" */}
+                        <br/>
                         <List
                             className="history"
                             dataSource={historyData}

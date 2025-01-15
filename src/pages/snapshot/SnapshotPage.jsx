@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import * as faceapi from 'face-api.js'; // Added face-api.js import
 import "./SnapshotPage.scss"
 import {Button, Layout, Spin, Toast} from "@douyinfe/semi-ui";
-import { IconCamera, IconChevronLeft } from "@douyinfe/semi-icons";
+import {IconCamera, IconChevronLeft} from "@douyinfe/semi-icons";
 import axiosInstance from "../../api/axiosInstance";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 const SnapshotPage = () => {
     const videoRef = useRef(null);
@@ -14,7 +14,7 @@ const SnapshotPage = () => {
     const [isReadyToTakePhoto, setIsReadyToTakePhoto] = useState(false);
     const [warning, setWarning] = useState('正在初始化摄像头和检测器，请稍候...');
     const [capturedImage, setCapturedImage] = useState(null); // Store captured image data
-    const { Header, Content, Footer } = Layout
+    const {Header, Content, Footer} = Layout
     const navigate = useNavigate()
     const [isButtonDisabled, setIsButtonDisabled] = useState(false)
     const [videoLoaded, setVideoLoaded] = useState(false);
@@ -66,8 +66,8 @@ const SnapshotPage = () => {
             const stream = await navigator.mediaDevices.getUserMedia({
                 video: {
                     facingMode: 'user',
-                    width: { ideal: 1000 }, // 请求理想宽度
-                    height: { ideal: 1700 }, // 请求理想高度
+                    width: {ideal: 1000}, // 请求理想宽度
+                    height: {ideal: 1700}, // 请求理想高度
                 },
                 audio: false, // 如果不需要音频，可以禁用
             });
@@ -99,7 +99,7 @@ const SnapshotPage = () => {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
 
-        const displaySize = { width: video.videoWidth, height: video.videoHeight };
+        const displaySize = {width: video.videoWidth, height: video.videoHeight};
         faceapi.matchDimensions(canvas, displaySize);
 
         try {
@@ -197,10 +197,10 @@ const SnapshotPage = () => {
             const byteCharacters = atob(base64Data);
             const byteNumbers = new Array(byteCharacters.length).fill().map((_, i) => byteCharacters.charCodeAt(i));
             const byteArray = new Uint8Array(byteNumbers);
-            const imageBlob = new Blob([byteArray], { type: 'image/png' });
+            const imageBlob = new Blob([byteArray], {type: 'image/png'});
 
             // 创建一个 File 对象
-            const imageFile = new File([imageBlob], 'captured-image.png', { type: 'image/png' });
+            const imageFile = new File([imageBlob], 'captured-image.png', {type: 'image/png'});
             formData.append('file', imageFile);
 
             // 发送 POST 请求
@@ -229,18 +229,24 @@ const SnapshotPage = () => {
             <Layout>
                 <Header className={"header"}>
                     <IconChevronLeft onClick={() => {
-                        if(!isButtonDisabled){
-                        navigate("/")
-                        }
-                        else {
+                        if (!isButtonDisabled) {
+                            navigate("/")
+                            const video = videoRef.current;
+                            if (video.srcObject) {
+                                const stream = video.srcObject;
+                                const tracks = stream.getTracks();
+                                tracks.forEach((track) => track.stop());
+                                video.srcObject = null;
+                            }
+                        } else {
                             Toast.warning("正在分析面部情况，请勿返回")
                         }
-                    }} />
+                    }}/>
                 </Header>
                 <Content className={"content"}>
                     {!capturedImage ? (
                         <div className={"photo-taking"}>
-                            <div className="video-container" style={{ position: 'relative' }}>
+                            <div className="video-container" style={{position: 'relative'}}>
                                 <video
                                     playsInline={true}
                                     ref={videoRef}
@@ -281,14 +287,14 @@ const SnapshotPage = () => {
                                     </svg>
                                 ) : null}
 
-                                <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
+                                <canvas ref={canvasRef} style={{display: 'none'}}></canvas>
                             </div>
                             <Button
                                 className={"photo-button"}
                                 onClick={takePhoto}
-                                style={{ backgroundColor: isReadyToTakePhoto ? "var(--sub-color)" : "gray" }}
+                                style={{backgroundColor: isReadyToTakePhoto ? "var(--sub-color)" : "gray"}}
                                 disabled={!isReadyToTakePhoto}
-                                icon={<IconCamera />}
+                                icon={<IconCamera/>}
                             >
                                 {isReadyToTakePhoto ? '拍照' : getWarningMessage()}
                             </Button>
@@ -297,7 +303,7 @@ const SnapshotPage = () => {
                     ) : (
                         <div className={"preview"}>
                             <h2>预览图片</h2>
-                            <img src={capturedImage} alt="Captured preview" style={{ width: '100%' }} />
+                            <img src={capturedImage} alt="Captured preview" style={{width: '100%'}}/>
                             <div className="options">
                                 <Button onClick={() => resetCamera()} disabled={isButtonDisabled}>重新拍照</Button>
                                 <Button onClick={() => {

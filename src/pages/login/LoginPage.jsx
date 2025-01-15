@@ -9,9 +9,11 @@ export const LoginPage = () => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const [loginOptionIsChoosed, setLoginOptionIsChoosed] = useState(false)
+    const [isLoginButtonDisabled,setIsLoginButtonDisabled] = useState(false);
 
     const handleLogin = async (values) => {
         setLoading(true);
+        setIsLoginButtonDisabled(true)
         try {
             const response = await axiosInstance.post('/user/doLogin', null, {
                 params: {
@@ -27,6 +29,7 @@ export const LoginPage = () => {
         } catch (err) {
         } finally {
             setLoading(false);
+            setIsLoginButtonDisabled(false);
         }
     };
 
@@ -85,6 +88,7 @@ export const LoginPage = () => {
                             />
                             <div className="login-actions">
                                 <motion.button
+                                    disabled={isLoginButtonDisabled}
                                     htmlType="submit"
                                     type="primary"
                                     loading={loading}

@@ -9,7 +9,6 @@
     background-color: black;
   }
   .content{
-    height: 92vh;
     .no-data-container{
       width: 100%;
       height: 100%;
@@ -34,7 +33,8 @@
         border-radius: 5vw;
         .avatar{
           width: 20vw;
-          height:20vw
+          height:20vw;
+          border-radius: 20px;
         }
         .info{
           height: 20vw;
@@ -67,6 +67,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: flex-start;
+      margin-bottom: 5vh;
       .graph{
       }
     }

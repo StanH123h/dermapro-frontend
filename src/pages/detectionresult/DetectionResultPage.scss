@@ -13,6 +13,9 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      .acne-image{
+        border-radius: 10%;
+      }
     }
     .dry-skin-analysis{
       display: flex;
@@ -44,6 +47,10 @@
     }
     .semi-table-row{
       *{
+        background-color: transparent;
+      }
+      .semi-table-row-cell{
+        background-image: none;
         background-color: transparent;
       }
       width: 100%;

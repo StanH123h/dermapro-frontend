@@ -80,9 +80,9 @@ const RegisterPage = () => {
                         placeholder="请选择性别"
                         style={{ width: '100%' }}
                         optionList={[
-                            { label: '男性', value: 0 },
-                            { label: '女性', value: 1 },
-                            { label: '其他', value: 2 },
+                            { label: '男性', value: 1 },
+                            { label: '女性', value: 2 },
+                            { label: '其他', value: 3 },
                         ]}
                     />
                     <div className="register-actions">

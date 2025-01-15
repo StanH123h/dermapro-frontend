@@ -19,6 +19,7 @@
         position: relative;
       }
         video {
+          border-radius: 5%;
           width: 100%; // 保证视频宽度占满容器
           height: auto; // 根据宽高比自动调整高度
           min-height: 70vh; // 保证不会超出视口

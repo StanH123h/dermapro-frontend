@@ -68,6 +68,8 @@ export const DetailedReportPage = () => {
                                 </span>
                             </div>
                             <AcneAnalyze imgUrl={"https://www.fuzhi.space/"+data.imageKey} data={data} />
+                            <br/>
+                            <br/>
                             <SkinAnalysis data={data.result} />
                         </>
                     )}

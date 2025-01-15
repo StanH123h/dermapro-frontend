@@ -9,9 +9,9 @@ import {IconColorPalette, IconExit} from "@douyinfe/semi-icons";
 
 export const ProfilePage = () => {
     const GENDER={
-        0:"男性",
-        1:"女性",
-        2:"其他"
+        1:"男性",
+        2:"女性",
+        3:"其他"
     }
     const [userInfo,setUserInfo] = useState({})
     useEffect(() => {
@@ -30,6 +30,7 @@ export const ProfilePage = () => {
     const [avatar, setAvatar] = useState(null); // 用于存储用户头像的 URL 或文件
     const fileInputRef = useRef(null); // 引用文件输入框
     const [isNewAvatar,setIsNewAvatar] = useState(false)
+    const [isLogoutButtunDisabled, setIsLogoutButtonDisabled] = useState(false)
 
     const handleAvatarClick = () => {
         fileInputRef.current.click(); // 模拟点击文件上传控件
@@ -86,13 +87,17 @@ export const ProfilePage = () => {
                             }
                         }}/>
                         <IconExit onClick={()=>{
-                            Toast.warning('您已退出登陆,即将跳转至登录页面');
-                            setTimeout(()=>{
-                                // 清除过期的 token
-                                localStorage.removeItem('fuzhitoken');
-                                // 导航到 /login
-                                window.location.href = '/login';
-                            },1000)
+                            if(!isLogoutButtunDisabled) {
+                                Toast.warning('您已退出登陆,即将跳转至登录页面');
+                                setTimeout(() => {
+                                    // 清除过期的 token
+                                    localStorage.removeItem('fuzhitoken');
+                                    setIsLogoutButtonDisabled(false)
+                                    // 导航到 /login
+                                    window.location.href = '/login';
+                                }, 1000)
+                                setIsLogoutButtonDisabled(true)
+                            }
                         }} />
                     </div>
 

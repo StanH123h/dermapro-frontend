@@ -119,6 +119,7 @@ export const AcneAnalyze = ({imgUrl, data}) => {
                 {/* 图片加载完成时触发 onLoad */}
                 <img
                     ref={imageRef}
+                    className={"acne-image"}
                     id="acne-image"
                     src={imgUrl}
                     alt="检测图片"
@@ -258,6 +259,8 @@ export const DetectionResultPage = () => {
                         </span>
                     </div>
                     <AcneAnalyze imgUrl={capturedImage} data={responseData}/>
+                    <br/>
+                    <br/>
                     <SkinAnalysis data={responseData.result}></SkinAnalysis>
                 </Content>
                 <Footer className="footer"></Footer>

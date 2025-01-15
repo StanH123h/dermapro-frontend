@@ -13,14 +13,14 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      .acne-image{
+        border-radius: 10%;
+      }
     }
     .dry-skin-analysis{
       display: flex;
       flex-direction: column;
       align-items: center;
-      .image{
-
-      }
     }
   }
   .data-display-type-nav-bar{
@@ -44,6 +44,10 @@
       align-items:center;
       justify-content: space-between;
       border-bottom: 1px #efefef solid;
+      .semi-table-row-cell{
+        background-image: none;
+        background-color: transparent;
+      }
       *{
         border:none;
       }
